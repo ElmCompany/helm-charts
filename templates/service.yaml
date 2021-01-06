@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "generic-app.fullname" . }}
+  labels:
+    {{- include "generic-app.labels" . | nindent 4 }}
+spec:
+  ports:
+  - name: tcp-{{ .Values.port }}
+    port: {{ .Values.port }}
+    protocol: TCP
+    targetPort: {{ .Values.port }}
+  selector:
+    {{- include "generic-app.labels" . | nindent 4 }}
+    deploymentconfig: {{ include "generic-app.fullname" . }}
+  sessionAffinity: None
+  type: ClusterIP

@@ -1,0 +1,99 @@
+# Default values for generic-app.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+openshift: true
+replicaCount: 1
+existingImageStream:
+  name:
+  namespace:
+imagePullSecrets: []
+
+deployTriggers:
+  imageStreamChange: false
+
+port: 8080
+extraPorts: []
+route:
+  enabled: false
+  host:
+  extraHosts: []
+
+####
+# envVars:
+#   SPRING_LOCATION_CONFIG: /opt/app.yaml
+#   SMS_API_PASSWORD: xBlah
+envVars: {}
+####
+files:
+  - name: app.yml
+    content: |
+      spring.something=somevalue
+      spring.db.pass=dsWEs
+    secure: true
+    mount: /opt/config
+  - name: index.html
+    content: |
+      <h1>Hello </h1>
+files: []
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+securityContext: {}
+rollout:
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi    
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nameOverride: ""
+fullnameOverride: ""
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
