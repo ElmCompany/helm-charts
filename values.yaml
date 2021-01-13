@@ -24,17 +24,11 @@ route:
 #   SMS_API_PASSWORD: xBlah
 envVars: {}
 ####
-files:
-  - name: app.yml
-    content: |
-      spring.something=somevalue
-      spring.db.pass=dsWEs
-    secure: true
-    mount: /opt/config
-  - name: index.html
-    content: |
-      <h1>Hello </h1>
-files: []
+config-file:
+  name: # application.properties
+  content: #
+  mount: # /opt/app
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: false
