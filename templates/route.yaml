@@ -7,6 +7,8 @@ metadata:
     {{- include "generic-app.labels" . | nindent 4 }}
 spec:
   host: {{ .Values.route.host }}
+  tls:
+    termination: edge
   port:
     targetPort: tcp-{{ .Values.port }}
   to:

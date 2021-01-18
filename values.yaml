@@ -28,11 +28,15 @@ configFile:
   name: # application.properties
   content: #
   mount: # /opt/app
+  ## example of config file content
+  # content: |
+  #   spring.appName = myapp
+  #   spring.context = /
 
 serviceAccount:
-  # Specifies whether a service account should be created
+  ## Specifies whether a service account should be created
   create: false
-  # Annotations to add to the service account
+  ## Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
