@@ -14,11 +14,7 @@ spec:
       - {{ include "generic-app.fullname" . }}
       from:
         kind: ImageStreamTag
-      {{- if .Values.existingImageStream.name }}
-        name: {{ .Values.existingImageStream.name }}:latest
-      {{- else }}
-        name: {{ include "generic-app.fullname" . }}:latest
-      {{- end }}
+        name: {{ printf "%s:%s" (include "generic-app.image-stream-name" .) (include "generic-app.image-stream-tag" .) }}
       {{- if .Values.existingImageStream.namespace }}
         namespace: {{ .Values.existingImageStream.namespace }}
       {{- end }}

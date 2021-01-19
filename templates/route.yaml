@@ -6,7 +6,7 @@ metadata:
   labels:
     {{- include "generic-app.labels" . | nindent 4 }}
 spec:
-  host: {{ .Values.route.host }}
+  host: {{ include "generic-app.host" . }}
   tls:
     termination: edge
   port:

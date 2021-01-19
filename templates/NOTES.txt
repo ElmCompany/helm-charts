@@ -4,7 +4,7 @@
 {{- end }}
 1. Get the application URL by running these commands:
 {{- if .Values.route.enabled }}
-  app is accessible at https://{{ .Values.route.host }}
+  app is accessible at https://{{ include "generic-app.host" . }}
 {{- end }}
 {{- if contains "NodePort" .Values.service.type -}}
   export NODE_PORT=$({{ $kubeclient }} get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "generic-app.fullname" . }})

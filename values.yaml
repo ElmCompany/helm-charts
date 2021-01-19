@@ -3,18 +3,24 @@
 # Declare variables to be passed into your templates.
 openshift: true
 replicaCount: 1
+image:
+  repository:
+  tag:
 existingImageStream:
   name:
   namespace:
+  tag: latest
 imagePullSecrets: []
 
 deployTriggers:
-  imageStreamChange: false
+  imageStreamChange: true
 
 port: 8080
 extraPorts: []
 route:
   enabled: false
+  ## domain: dev-apps.elm.sa
+  domain:
   host:
   extraHosts: []
 

@@ -1,4 +1,4 @@
-{{- if not .Values.existingImageStream.name -}}
+{{- if or (not .Values.existingImageStream.name) (.Values.image.repository) }}
 apiVersion: image.openshift.io/v1
 kind: ImageStream
 metadata:
@@ -6,6 +6,15 @@ metadata:
   labels:
     {{- include "generic-app.labels" . | nindent 4 }}
 spec:
+{{- if .Values.image.repository }}
+  dockerImageRepository: {{ .Values.image.repository }}
+  tags:
+    - name: {{ (include "generic-app.image-stream-tag" .) | quote }}
+      from:
+        kind: DockerImage
+        name: '{{ .Values.image.repository }}:{{ include "generic-app.image-stream-tag" . }}'
+{{- else }}
   lookupPolicy:
     local: false
+{{- end }}
 {{- end }}

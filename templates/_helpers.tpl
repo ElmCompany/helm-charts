@@ -61,3 +61,48 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+
+
+      # {{- if .Values.existingImageStream.name }}
+      #   name: {{ .Values.existingImageStream.name }}:latest
+      # {{- else }}
+      #   name: {{ include "generic-app.fullname" . }}:latest
+      # {{- end }}
+
+{{/*
+   imagestream name
+*/}}
+{{- define "generic-app.image-stream-name" -}}
+{{- if .Values.existingImageStream.name }}
+{{- .Values.existingImageStream.name }}
+{{- else }}
+{{- include "generic-app.fullname" . }}
+{{- end }}
+{{- end }}
+
+{{/*
+  imagestream tag
+*/}}
+{{- define "generic-app.image-stream-tag" -}}
+{{- if .Values.image.repository }}
+{{- default "latest" .Values.image.tag }}
+{{- else if .Values.existingImageStream.name }}
+{{- default "latest" .Values.existingImageStream.tag  }}
+{{- else }}
+{{- printf "%s" "latest" }}
+{{- end }}
+{{- end }}
+
+
+{{/*
+host name
+*/}}
+{{- define "generic-app.host" -}}
+{{- if .Values.route.host }}
+{{- .Values.route.host }}
+{{- else if .Values.route.domain }}
+{{- printf "%s-%s.%s" .Release.Namespace .Release.Name .Values.route.domain }}
+{{- end }}
+{{- end }}
+
