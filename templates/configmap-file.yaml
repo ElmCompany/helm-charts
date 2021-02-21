@@ -6,5 +6,6 @@ metadata:
   labels:
     {{- include "generic-app.labels" . | nindent 4 }}
 data:
-  {{ .Values.configFile.name }}: {{ .Values.configFile.content }}
+  {{ .Values.configFile.name }}: |
+    {{ .Values.configFile.content | nindent 4 }}
 {{- end }}
