@@ -61,6 +61,7 @@ spec:
         volumeMounts:
           - mountPath: {{ .Values.configFile.mount }}
             name: config-file
+            readOnly: true
         {{- end }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
@@ -70,10 +71,10 @@ spec:
         - name: config-file
           configMap:
             defaultMode: 420
-            name: {{ include "generic-app.fullname" . }}-files
-            items:
-              - key: {{ .Values.configFile.name }}
-                path: {{ .Values.configFile.name }}
+            name: {{ include "generic-app.fullname" . }}-file
+            # items:
+            #   - key: {{ .Values.configFile.name }}
+            #     path: {{ .Values.configFile.name }}
       {{- end }}
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}
