@@ -96,7 +96,6 @@ autoscaling:
   # targetMemoryUtilizationPercentage: 80
 
 nexus:
-  enabled: true
   host: nexus.elm.sa
   fullnameOverride: nexus
 nameOverride: ""
