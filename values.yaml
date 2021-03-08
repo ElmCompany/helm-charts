@@ -1,17 +1,19 @@
 # Default values for generic-app.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+
 openshift: true
 replicaCount: 1
 image:
   repository:
   tag:
+  pullSecret: 'nexus'
 existingImageStream:
   name:
   namespace:
   tag: latest
-imagePullSecrets: []
 
+maxDeploymentRevision: 10
 deployTriggers:
   imageStreamChange: true
 
@@ -93,6 +95,10 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
+nexus:
+  enabled: true
+  host: nexus.elm.sa
+  fullnameOverride: nexus
 nameOverride: ""
 fullnameOverride: ""
 

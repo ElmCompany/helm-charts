@@ -1,0 +1,6 @@
+dependencies:
+- name: private-registry
+  repository: https://nexus.elm.sa/repository/charts
+  version: 1.0.12
+digest: sha256:4964d83e0fe9b668d456b2b703b6ed0643397fe8ebe452e82627d026617a068b
+generated: "2021-03-08T19:14:53.6741577+03:00"

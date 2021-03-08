@@ -40,6 +40,10 @@ spec:
         {{- include "generic-app.labels" . | nindent 8 }}
         deploymentconfig: {{ include "generic-app.fullname" . }}
     spec:
+    {{- if .Values.image.repository }}
+      imagePullSecrets:
+        - name: {{ .Values.image.pullSecret }}
+    {{- end }}
       containers:
       - name: {{ include "generic-app.fullname" . }}
         imagePullPolicy: Always

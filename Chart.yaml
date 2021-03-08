@@ -21,6 +21,12 @@ version: 0.1.0
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 appVersion: 1.16.0
+dependencies: # A list of the chart requirements (optional)
+  - name: private-registry # The name of the chart (nginx)
+    version: 1.0.12 # The version of the chart ("1.2.3")
+    repository: https://nexus.elm.sa/repository/charts
+    condition: image.repository
+    alias: nexus
 maintainers:
 - name: abdennour
   email: atoumi@elm.sa
