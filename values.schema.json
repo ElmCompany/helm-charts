@@ -1,0 +1,151 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+        "affinity": {
+            "type": "object"
+        },
+        "autoscaling": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "maxReplicas": {
+                    "type": "integer"
+                },
+                "minReplicas": {
+                    "type": "integer"
+                },
+                "targetCPUUtilizationPercentage": {
+                    "type": "integer"
+                }
+            }
+        },
+        "deployTriggers": {
+            "type": "object",
+            "properties": {
+                "imageStreamChange": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "envVars": {
+            "type": "object"
+        },
+        "existingImageStream": {
+            "type": "object",
+            "properties": {
+                "tag": {
+                    "type": "string"
+                }
+            }
+        },
+        "extraPorts": {
+            "type": "array"
+        },
+        "fullnameOverride": {
+            "type": "string"
+        },
+        "image": {
+            "type": "object",
+            "properties": {
+                "pullSecret": {
+                    "type": "string"
+                }
+            }
+        },
+        "maxDeploymentRevision": {
+            "type": "integer"
+        },
+        "nameOverride": {
+            "type": "string"
+        },
+        "nexus": {
+            "type": "object",
+            "properties": {
+                "fullnameOverride": {
+                    "type": "string"
+                },
+                "host": {
+                    "type": "string"
+                }
+            }
+        },
+        "nodeSelector": {
+            "type": "object"
+        },
+        "openshift": {
+            "type": "boolean"
+        },
+        "podAnnotations": {
+            "type": "object"
+        },
+        "podSecurityContext": {
+            "type": "object"
+        },
+        "port": {
+            "type": "integer",
+            "minimum": 1025,
+            "maximum": 9999
+        },
+        "replicaCount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 6
+        },
+        "resources": {
+            "type": "object"
+        },
+        "rollout": {
+            "type": "object",
+            "properties": {
+                "resources": {
+                    "type": "object"
+                }
+            }
+        },
+        "route": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "extraHosts": {
+                    "type": "array"
+                }
+            }
+        },
+        "securityContext": {
+            "type": "object"
+        },
+        "service": {
+            "type": "object",
+            "properties": {
+                "port": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "serviceAccount": {
+            "type": "object",
+            "properties": {
+                "annotations": {
+                    "type": "object"
+                },
+                "create": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "tolerations": {
+            "type": "array"
+        }
+    }
+}
