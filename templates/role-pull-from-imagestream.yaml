@@ -1,5 +1,5 @@
 ## alternative of : 
-##  oc policy add-role-to-group -n elm-images \
+##  oc policy add-role-to-group -n  {{ .Values.image.stream.namespace }} \
 ##    system:image-puller system:serviceaccounts:{{.Release.Namespace}} --dry-run -o yaml
 {{ if (.Values.image.stream.namespace) }}
 ---
