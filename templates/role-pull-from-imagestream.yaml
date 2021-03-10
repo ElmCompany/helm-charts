@@ -15,7 +15,13 @@ roleRef:
   kind: ClusterRole
   name: system:image-puller
 subjects:
-- apiGroup: rbac.authorization.k8s.io
-  kind: Group
-  name: system:serviceaccounts:{{ .Release.Namespace }}
+  - kind: ServiceAccount
+    name: default
+    namespace: {{ .Release.Namespace }}
+  - kind: ServiceAccount
+    name: builder
+    namespace: {{ .Release.Namespace }}
+  - kind: ServiceAccount
+    name: deployer
+    namespace: {{ .Release.Namespace }}
 {{ end }}
