@@ -5,17 +5,35 @@
 openshift: true
 replicaCount: 1
 image:
-  repository:
+  ## tag: latest (check image tag pushed by pipeline service after build)
   tag:
+  ## One of two is REQUIRED: either image.repository or image.stream
+  ## repository: .e.g. nexus.elm.sa/zaw-snapshots/myapp
+  ##             Useful if the image is outside the internal
+  ##             registry of the OCP cluster (e.g. dev, qa)
+  ##        (check image repo pushed by pipeline service after build)
+  repository:
+  ## pullSecret: if repository is private, use pullSecret
+  ##             defaults to nexus
   pullSecret: 'nexus'
-existingImageStream:
-  name:
-  namespace:
-  tag: latest
+  ## imagestream - relative to the Cluster where resources will be deployed
+  ##               useful if the image is inside the internal
+  ##               registry of the OCP cluster (.e.g staging, prod)
+  stream:
+    ## imagestream resource name
+    name:
+    ## namespace like: elm-images or openshift : depends where is your imagestream
+    ## it defaults to namespace of the RELEASE
+    namespace:
 
-maxDeploymentRevision: 10
-deployTriggers:
-  imageStreamChange: true
+nexus:
+  host: nexus.elm.sa
+  fullnameOverride: nexus
+
+deployment:
+  revisionHistoryLimit: 5
+  triggers:
+    imageStreamChange: true
 
 port: 8080
 extraPorts: []
@@ -86,7 +104,7 @@ rollout:
     #   memory: 128Mi
     # requests:
     #   cpu: 100m
-    #   memory: 128Mi    
+    #   memory: 128Mi
 
 autoscaling:
   enabled: false
@@ -95,9 +113,6 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
-nexus:
-  host: nexus.elm.sa
-  fullnameOverride: nexus
 nameOverride: ""
 fullnameOverride: ""
 

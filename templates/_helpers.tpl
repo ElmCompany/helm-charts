@@ -74,23 +74,10 @@ Create the name of the service account to use
    imagestream name
 */}}
 {{- define "generic-app.image-stream-name" -}}
-{{- if .Values.existingImageStream.name }}
-{{- .Values.existingImageStream.name }}
+{{- if .Values.image.stream.name }}
+{{- .Values.image.stream.name }}
 {{- else }}
 {{- include "generic-app.fullname" . }}
-{{- end }}
-{{- end }}
-
-{{/*
-  imagestream tag
-*/}}
-{{- define "generic-app.image-stream-tag" -}}
-{{- if .Values.image.repository }}
-{{- default "latest" .Values.image.tag }}
-{{- else if .Values.existingImageStream.name }}
-{{- default "latest" .Values.existingImageStream.tag  }}
-{{- else }}
-{{- printf "%s" "latest" }}
 {{- end }}
 {{- end }}
 

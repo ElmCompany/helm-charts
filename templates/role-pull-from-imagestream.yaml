@@ -1,0 +1,20 @@
+## alternative of : 
+##  oc policy add-role-to-group -n elm-images \
+##    system:image-puller system:serviceaccounts:{{.Release.Namespace}} --dry-run -o yaml
+{{ if (.Values.image.stream.namespace) }}
+---
+kind: RoleBinding
+metadata:
+  name: image-puller-{{ include "generic-app.fullname" . }}
+  namespace: {{ .Values.image.stream.namespace }}
+  labels:
+    {{- include "generic-app.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:image-puller
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: system:serviceaccounts:{{ .Release.Namespace }}
+{{ end }}

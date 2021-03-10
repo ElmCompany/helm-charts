@@ -6,17 +6,18 @@ metadata:
     {{- include "generic-app.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: {{ .Values.deployment.revisionHistoryLimit }}
   triggers:
   - type: ConfigChange
   - imageChangeParams:
-      automatic: {{ .Values.deployTriggers.imageStreamChange }}
+      automatic: {{ .Values.deployment.triggers.imageStreamChange }}
       containerNames:
       - {{ include "generic-app.fullname" . }}
       from:
         kind: ImageStreamTag
-        name: {{ printf "%s:%s" (include "generic-app.image-stream-name" .) (include "generic-app.image-stream-tag" .) }}
-      {{- if .Values.existingImageStream.namespace }}
-        namespace: {{ .Values.existingImageStream.namespace }}
+        name: {{ printf "%s:%s" (include "generic-app.image-stream-name" .) .Values.image.tag }}
+      {{- if .Values.image.stream.namespace }}
+        namespace: {{ .Values.image.stream.namespace }}
       {{- end }}
     type: ImageChange
   selector:
