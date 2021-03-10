@@ -19,6 +19,12 @@ image:
   ## imagestream - relative to the Cluster where resources will be deployed
   ##               useful if the image is inside the internal
   ##               registry of the OCP cluster (.e.g staging, prod)
+  ##   for example, if the image is availabe in OCP internal registry under
+  ##    this name: "registry.rnd-apps.elm.sa/elm-images/myapp:v1.0.0"
+  ##    then: 
+  # stream:
+  #   name: myapp
+  #   namespace: elm-images
   stream:
     ## imagestream resource name
     name:

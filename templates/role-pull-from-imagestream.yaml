@@ -1,9 +1,10 @@
 ## alternative of : 
 ##  oc policy add-role-to-group -n  {{ .Values.image.stream.namespace }} \
 ##    system:image-puller system:serviceaccounts:{{.Release.Namespace}} --dry-run -o yaml
-{{ if (.Values.image.stream.namespace) }}
+{{ if and .Values.openshift (.Values.image.stream.namespace) }}
 ---
 kind: RoleBinding
+apiVersion: authorization.openshift.io/v1
 metadata:
   name: image-puller-{{ include "generic-app.fullname" . }}
   namespace: {{ .Values.image.stream.namespace }}
