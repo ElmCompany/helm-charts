@@ -1,4 +1,4 @@
-## alternative of : 
+## alternative of :
 ##  oc policy add-role-to-group -n  {{ .Values.image.stream.namespace }} \
 ##    system:image-puller system:serviceaccounts:{{.Release.Namespace}} --dry-run -o yaml
 {{ if and .Values.openshift (.Values.image.stream.namespace) }}
@@ -11,8 +11,6 @@ metadata:
   labels:
     {{- include "generic-app.labels" . | nindent 4 }}
 roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
   name: system:image-puller
 subjects:
   - kind: ServiceAccount
