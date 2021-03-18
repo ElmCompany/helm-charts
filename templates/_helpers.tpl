@@ -70,17 +70,6 @@ Create the name of the service account to use
       #   name: {{ include "generic-app.fullname" . }}:latest
       # {{- end }}
 
-{{/*
-   imagestream name
-*/}}
-{{- define "generic-app.image-stream-name" -}}
-{{- if .Values.image.stream.name }}
-{{- .Values.image.stream.name }}
-{{- else }}
-{{- include "generic-app.fullname" . }}
-{{- end }}
-{{- end }}
-
 
 {{/*
 host name

@@ -15,7 +15,7 @@ spec:
       - {{ include "generic-app.fullname" . }}
       from:
         kind: ImageStreamTag
-        name: {{ printf "%s:%s" (include "generic-app.image-stream-name" .) .Values.image.tag }}
+        name: {{ printf "%s:%s" (include "generic-app.fullname" .) .Values.image.tag }}
     type: ImageChange
   selector:
     {{- include "generic-app.labels" . | nindent 4 }}
