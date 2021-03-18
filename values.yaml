@@ -130,6 +130,10 @@ tolerations: []
 
 affinity: {}
 
+netNamespace:
+  enabled: false
+  egressIP: 
+  netid:
 ####
 ## User Access Controler
 ### admin users

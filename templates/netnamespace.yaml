@@ -1,0 +1,10 @@
+{{ if .Values.netNamespace.enabled }}
+apiVersion: network.openshift.io/v1
+egressIPs:
+- {{ .Values.netNamespace.egressIP }}
+kind: NetNamespace
+metadata:
+  name: {{ .Release.Namespace }}
+netid: {{ .Values.netNamespace.netid }}
+netname: {{ .Release.Namespace }}
+{{ end }}
