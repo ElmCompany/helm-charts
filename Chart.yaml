@@ -25,7 +25,7 @@ dependencies: # A list of the chart requirements (optional)
   - name: private-registry # The name of the chart (nginx)
     version: 1.0.13 # The version of the chart ("1.2.3")
     repository: https://nexus.elm.sa/repository/charts
-    condition: image.repository
+    condition: nexus.enabled
     alias: nexus
 maintainers:
 - name: abdennour

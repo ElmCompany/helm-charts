@@ -1,7 +1,6 @@
 # Default values for generic-app.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-
 openshift: true
 replicaCount: 1
 image:
@@ -9,6 +8,7 @@ image:
   tag:
   ## One of two is REQUIRED: either image.repository or image.stream
   ## repository: .e.g. nexus.elm.sa/zaw-snapshots/myapp
+  ##            it's the full image name , except the tag
   ##             Useful if the image is outside the internal
   ##             registry of the OCP cluster (e.g. dev, qa)
   ##        (check image repo pushed by pipeline service after build)
@@ -31,8 +31,10 @@ image:
     ## namespace like: elm-images or openshift : depends where is your imagestream
     ## it defaults to namespace of the RELEASE
     namespace:
+    internalRegistry: docker-registry.default.svc:5000
 
 nexus:
+  enabled: false
   host: nexus.elm.sa
   fullnameOverride: nexus
 
@@ -127,3 +129,18 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+####
+## User Access Controler
+### admin users
+userAccessControl:
+  enabled: false
+  adminUsers:
+    - "CN=Narendra Kiran Tippana,OU=SOS Users,OU=SOS,OU=ELM,DC=PRDMGT,DC=COM,DC=SA"
+    - "CN=Abdulrahman Alwafai,OU=SOS Users,OU=SOS,OU=ELM,DC=PRDMGT,DC=COM,DC=SA"
+    - "CN=Ismail Abdullah Hashim,OU=SOS Users,OU=SOS,OU=ELM,DC=PRDMGT,DC=COM,DC=SA"
+    - "CN=Ibrahim Rashad Abdullah,OU=SOS Users,OU=SOS,OU=ELM,DC=PRDMGT,DC=COM,DC=SA"
+    - "CN=Saravanan Thangaraj,OU=SOS Users,OU=SOS,OU=ELM,DC=PRDMGT,DC=COM,DC=SA"
+    - "CN=Mushabbab Fehaid Alsubaie,OU=SOS Users,OU=SOS,OU=ELM,DC=PRDMGT,DC=COM,DC=SA"
+  additionalAdminUsers: []
+

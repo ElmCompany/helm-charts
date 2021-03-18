@@ -1,4 +1,3 @@
-{{- if or (not .Values.image.stream.name) (.Values.image.repository) }}
 apiVersion: image.openshift.io/v1
 kind: ImageStream
 metadata:
@@ -6,15 +5,20 @@ metadata:
   labels:
     {{- include "generic-app.labels" . | nindent 4 }}
 spec:
-{{- if .Values.image.repository }}
+  {{- if .Values.image.repository }}
   dockerImageRepository: {{ .Values.image.repository }}
+  {{- end }}
   tags:
     - name: {{ .Values.image.tag | quote }}
       from:
         kind: DockerImage
+        {{- if .Values.image.repository }}
+        # it's pointer on image in any repository
         name: '{{ .Values.image.repository }}:{{ .Values.image.tag }}'
-{{- else }}
+        {{- else }}
+        # it's pointer on image in imagestream in .Values.image.stream.namespace
+        # quotes are required :) !!
+        name: '{{ .Values.image.stream.internalRegistry }}/{{ .Values.image.stream.namespace }}/{{ .Values.image.stream.name }}:{{ .Values.image.tag }}'
+        {{- end }}
   lookupPolicy:
     local: false
-{{- end }}
-{{- end }}
