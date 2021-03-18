@@ -85,6 +85,17 @@ Create the name of the service account to use
 {{/*
 host name
 */}}
+{{- define "generic-app.imageRepo" -}}
+{{- if .Values.image.repository }}
+{{- .Values.image.repository }}
+{{- else }}
+{{- printf "%s/%s/%s" .Values.image.stream.internalRegistry .Values.image.stream.namespace .Values.image.stream.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+host name
+*/}}
 {{- define "generic-app.host" -}}
 {{- if .Values.route.host }}
 {{- .Values.route.host }}
