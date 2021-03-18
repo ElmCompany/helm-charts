@@ -5,6 +5,8 @@ egressIPs:
 kind: NetNamespace
 metadata:
   name: {{ .Release.Namespace }}
+{{- if .Values.netNamespace.netid }}
 netid: {{ .Values.netNamespace.netid }}
+{{- end }}
 netname: {{ .Release.Namespace }}
 {{ end }}
