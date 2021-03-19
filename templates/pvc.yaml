@@ -1,0 +1,16 @@
+{{ if .Values.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "generic-app.fullname" . }}
+  labels:
+    {{- include "generic-app.labels" . | nindent 4 }}
+  # finalizers:
+  # - kubernetes.io/pvc-protection
+spec:
+  accessModes:
+  - {{ .Values.persistence.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.storage }}
+{{ end }}

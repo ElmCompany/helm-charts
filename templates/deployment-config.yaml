@@ -42,6 +42,10 @@ spec:
       imagePullSecrets:
         - name: {{ .Values.image.pullSecret }}
     {{- end }}
+      initContainers:
+{{- if .Values.initContainers }}
+{{ tpl (toYaml .Values.initContainers) . | indent 8 }}
+{{- end }}
       containers:
       - name: {{ include "generic-app.fullname" . }}
         imagePullPolicy: Always
@@ -51,6 +55,10 @@ spec:
           protocol: TCP
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
+        livenessProbe:
+          {{- toYaml .Values.livenessProbe | nindent 10 }}
+        readinessProbe:
+          {{- toYaml .Values.readinessProbe | nindent 10 }}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
         {{- with .Values.envVars }}
@@ -58,18 +66,27 @@ spec:
           - secretRef:
               name: {{ include "generic-app.fullname" $ }}-env-vars
         {{- end }}
-
-        {{- if .Values.configFile.mount }}
         volumeMounts:
+{{- if .Values.volumeMounts }}
+{{ tpl (toYaml .Values.volumeMounts | indent 10) . }}
+{{- end }}
+        {{- if .Values.configFile.mount }}
           - mountPath: {{ .Values.configFile.mount }}
             name: config-file
             readOnly: true
         {{- end }}
+        {{- if .Values.persistence.enabled }}
+          - name: pvc-1
+            mountPath: {{ .Values.persistence.mount }} 
+        {{- end }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
-      {{- if .Values.configFile.mount }}
       volumes:
+{{- if .Values.volumes }}
+{{ tpl (toYaml .Values.volumes | indent 8) . }}
+{{- end }}
+      {{- if .Values.configFile.mount }}
         - name: config-file
           configMap:
             defaultMode: 420
@@ -77,6 +94,11 @@ spec:
             # items:
             #   - key: {{ .Values.configFile.name }}
             #     path: {{ .Values.configFile.name }}
+      {{- end }}
+      {{- if .Values.persistence.enabled }}
+        - name: pvc-1
+          persistentVolumeClaim:
+            claimName: {{ include "generic-app.fullname" . }}
       {{- end }}
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}

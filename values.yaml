@@ -6,7 +6,7 @@ replicaCount: 1
 image:
   ## tag: latest (check image tag pushed by pipeline service after build)
   tag:
-  ## One of two is REQUIRED: either image.repository or image.stream
+  ## One of two is REQUIRED: either image.repository or image.stream...and NOT both
   ## repository: .e.g. nexus.elm.sa/zaw-snapshots/myapp
   ##            it's the full image name , except the tag
   ##             Useful if the image is outside the internal
@@ -56,6 +56,7 @@ route:
 # envVars:
 #   SPRING_LOCATION_CONFIG: /opt/app.yaml
 #   SMS_API_PASSWORD: xBlah
+#   REACT_APP_API_URL: https://api.example.com/v2
 envVars: {}
 ####
 configFile:
@@ -93,17 +94,62 @@ service:
   type: ClusterIP
   port: 80
 
+## livenessProbe ##
+## How to know that your app is alive. If it's not alive, it will keep restarting
+##   more details: oc explain dc.spec.template.spec.containers.livenessProbe
+## If you do want to specify resources, uncomment the following
+## lines, adjust them as necessary, and remove the curly braces after 'livenessProbe:'.
+livenessProbe: {}
+  # httpGet:
+  #   path: /healthz
+  #   port: http
+## full example
+  # httpGet:
+  #   path: /healthz
+  #   port: http
+  # successThreshold: 1
+  # failureThreshold: 3
+  # periodSeconds: 10 # How often (in seconds) to perform the probe
+  # initialDelaySeconds: 30  # Helpful for long app startup
+  # timeoutSeconds: 1
+## another -livenessProbe example - based on local command instead of rest call
+  # exec:
+  #   command:
+  #    - pgrep
+  #    - java
+## another -livenessProbe example - based on tcp instead of layer 7
+  # tcpSocket:
+  #   port: 6379
+
+## readinessProbe ##
+## How to know that your app is READY to receive traffic?
+## If it's not ready, endpoint between service/pod will not be created 
+##    then traffic will not be forwarded to the pod
+##    more details: oc explain dc.spec.template.spec.containers.readinessProbe
+## If you do want to specify resources, uncomment the following
+## lines, adjust them as necessary, and remove the curly braces after 'readinessProbe:'.
+readinessProbe: {}
+  # httpGet:
+  #   path: /healthz
+  #   port: http
+## check also all livenessProbe examples, they have same fields but not same purpose
+
+## We usually recommend not to specify default resources and to leave this as a conscious
+## choice for the user. This also increases chances charts run on environments with little
+## resources, such as Minikube. If you do want to specify resources, uncomment the following
+## lines, adjust them as necessary, and remove the curly braces after 'resources:'.
 resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
   # requests:
   #   cpu: 100m
   #   memory: 128Mi
+
+## securityContext Pod Level:
+## Get fields of this value by running "oc explain dc.spec.template.spec.securityContext"
+## If you do want to specify resources, uncomment the following
+## lines, adjust them as necessary, and remove the curly braces after 'securityContext:'.
 securityContext: {}
 rollout:
   resources: {}
@@ -130,21 +176,37 @@ tolerations: []
 
 affinity: {}
 
-netNamespace:
+persistence:
   enabled: false
-  egressIP: 
-  netid:
-####
-## User Access Controler
-### admin users
-userAccessControl:
-  enabled: false
-  adminUsers:
-    - "CN=Narendra Kiran Tippana,OU=SOS Users,OU=SOS,OU=ELM,DC=PRDMGT,DC=COM,DC=SA"
-    - "CN=Abdulrahman Alwafai,OU=SOS Users,OU=SOS,OU=ELM,DC=PRDMGT,DC=COM,DC=SA"
-    - "CN=Ismail Abdullah Hashim,OU=SOS Users,OU=SOS,OU=ELM,DC=PRDMGT,DC=COM,DC=SA"
-    - "CN=Ibrahim Rashad Abdullah,OU=SOS Users,OU=SOS,OU=ELM,DC=PRDMGT,DC=COM,DC=SA"
-    - "CN=Saravanan Thangaraj,OU=SOS Users,OU=SOS,OU=ELM,DC=PRDMGT,DC=COM,DC=SA"
-    - "CN=Mushabbab Fehaid Alsubaie,OU=SOS Users,OU=SOS,OU=ELM,DC=PRDMGT,DC=COM,DC=SA"
-  additionalAdminUsers: []
+  mount: # .e.g /var/lib/redis/data
+  storage: 1Gi
+  accessMode: ReadWriteMany # or ReadWriteOnce
+
+########### Additional Resources ############
+## initContainers
+## it's List / Array
+initContainers:
+  # - name: env-generator
+  #   image: nexus.elm.sa/abdennour/dotenv-to-js-object:4ea
+  #   args:
+  #     - --dest=/data
+  #     - --env-vars-filter=REACT_APP_
+  #     - --run-as=job
+  #   volumeMounts:
+  #     - name: data-env
+  #       mountPath: /data
+  #   envFrom:
+  #     - secretRef:
+
+## additional volumeMounts
+## it's List / Array
+volumeMounts:
+  # - name: data-env
+  #   mountPath: /usr/share/nginx/html/config
+## additional volumes
+## it's list / Array
+volumes:
+  # - name: data-env
+  #   emptyDir: {}
+
 
