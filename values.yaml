@@ -31,7 +31,7 @@ image:
     ## namespace like: elm-images or openshift : depends where is your imagestream
     ## it defaults to namespace of the RELEASE
     namespace:
-    internalRegistry: docker-registry.default.svc:5000
+    registry: docker-registry.default.svc:5000
 
 nexus:
   enabled: false
@@ -179,9 +179,13 @@ affinity: {}
 persistence:
   enabled: false
   mount: # .e.g /var/lib/redis/data
-  storage: 1Gi
+  size: 1Gi
   accessMode: ReadWriteMany # or ReadWriteOnce
-
+  ## jenkins data Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  storageClass:
 ########### Additional Resources ############
 ## initContainers
 ## it's List / Array

@@ -42,8 +42,8 @@ spec:
       imagePullSecrets:
         - name: {{ .Values.image.pullSecret }}
     {{- end }}
-      initContainers:
 {{- if .Values.initContainers }}
+      initContainers:
 {{ tpl (toYaml .Values.initContainers) . | indent 8 }}
 {{- end }}
       containers:

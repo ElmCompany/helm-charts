@@ -78,7 +78,7 @@ host name
 {{- if .Values.image.repository }}
 {{- .Values.image.repository }}
 {{- else }}
-{{- printf "%s/%s/%s" .Values.image.stream.internalRegistry .Values.image.stream.namespace .Values.image.stream.name }}
+{{- printf "%s/%s/%s" .Values.image.stream.registry .Values.image.stream.namespace .Values.image.stream.name }}
 {{- end }}
 {{- end }}
 
