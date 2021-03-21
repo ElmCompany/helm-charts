@@ -99,7 +99,7 @@ service:
 ##   more details: oc explain dc.spec.template.spec.containers.livenessProbe
 ## If you do want to specify resources, uncomment the following
 ## lines, adjust them as necessary, and remove the curly braces after 'livenessProbe:'.
-livenessProbe:
+livenessProbe: {}
   # httpGet:
   #   path: /healthz
   #   port: http
@@ -128,7 +128,7 @@ livenessProbe:
 ##    more details: oc explain dc.spec.template.spec.containers.readinessProbe
 ## If you do want to specify resources, uncomment the following
 ## lines, adjust them as necessary, and remove the curly braces after 'readinessProbe:'.
-readinessProbe:
+readinessProbe: {}
   # httpGet:
   #   path: /healthz
   #   port: http
