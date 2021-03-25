@@ -37,6 +37,11 @@ spec:
       labels:
         {{- include "generic-app.labels" . | nindent 8 }}
         deploymentconfig: {{ include "generic-app.fullname" . }}
+      annotations:
+        checksum/configenvvars: {{ include (print $.Template.BasePath "/secret-env-vars.yaml") . | sha256sum }}
+      {{- if .Values.configFile.name }}
+        checksum/configfile: {{ include (print $.Template.BasePath "/configmap-file.yaml") . | sha256sum }}
+      {{- end }}
     spec:
     {{- if .Values.image.repository }}
       imagePullSecrets:
