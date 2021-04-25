@@ -2,8 +2,17 @@
 This chart installs any application on top of kubernetes cluster.
 For the time being, it's compatible with Openshift 3.11.
 
-This is a very generic chart that installs any app as per the values.
+This is a very generic chart that installs any web app as per the given values. If your app requires:
+-  a single deployment(pod), 
+- with a single container
+- with a single service port
+And optionally:
+- or/and exposing a hostname thru route or ingress
+- or/and creating/attaching persistence volume claim
+- or/and populating environment variables thur secret.
+- or/and mounting a single config file
 
+If so, this chart should answer your needs.
 
 # Values
 

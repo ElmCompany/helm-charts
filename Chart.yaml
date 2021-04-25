@@ -1,7 +1,22 @@
 apiVersion: v2
 name: generic-app
-description: A Helm chart for Kubernetes
+description: | 
+  A Helm chart to install any web application that requires 
+  a single deployment(pod), with a single container.
 
+icon: https://themes.devops.elm.sa/icons/generic-app.png
+keywords:
+  - generic-app
+  - pod
+  - route
+  - web
+  - mount
+  - envvars
+  - dotenv
+  - openshift
+  - ocp3
+  - openshift3
+  - elm
 # A chart can be either an 'application' or a 'library' chart.
 #
 # Application charts are a collection of templates that can be packaged into versioned archives

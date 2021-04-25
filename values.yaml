@@ -33,41 +33,60 @@ image:
     namespace:
     registry: docker-registry.default.svc:5000
 
+### registry secret ###
+# if .image.repository points to a repository from nexus.elm.sa, 
+# then, .nexus.enabled must equals true in order to authenticate
+# your namespace/project to Nexus container registry
 nexus:
   enabled: false
   host: nexus.elm.sa
   fullnameOverride: nexus
 
+### more props about deployment ###  
 deployment:
+  ## about how many replicaset should be kept in the history
   revisionHistoryLimit: 5
+  ## triggers for auto rolling-update pods.
   triggers:
     imageStreamChange: true
-
+## your app port (container port)
+# port: 5000 # maybe for python app
+# port: 3000 # maybe for nodejs, react app,.. so on
 port: 8080
 extraPorts: []
+## Assiging public Hostname to your app
 route:
   enabled: false
   ## domain: dev-apps.elm.sa
+  ## if you specify domain, the chart will automatically calculate
+  ## the subdomain , then the full hostname will be subdomain.domain
   domain:
+  ## specify the exact hostname as you want 
+  ## without delegating it to the automation
   host:
   extraHosts: []
 
 ####
+## Environment Variables to be populated inside the container of the app
 # envVars:
 #   SPRING_LOCATION_CONFIG: /opt/app.yaml
 #   SMS_API_PASSWORD: xBlah
 #   REACT_APP_API_URL: https://api.example.com/v2
 envVars: {}
 ####
+### configFile is useful to mount a whole config file ###
 configFile:
   name: # application.properties
-  content: #
-  mount: # /opt/app
+  ## what's the content of this config file
+  ## Hint: Check YAML syntax, to use multi-line string
   ## example of config file content
   # content: |
   #   spring.appName = myapp
   #   spring.context = /
-
+  content: #
+  ## At a specific path, the config file will be mounted
+  ##   inside the container where the app is running
+  mount: # /opt/app
 serviceAccount:
   ## Specifies whether a service account should be created
   create: false
@@ -176,6 +195,7 @@ tolerations: []
 
 affinity: {}
 
+### Do you requires any data persistence ? ###
 persistence:
   enabled: false
   mount: # .e.g /var/lib/redis/data
