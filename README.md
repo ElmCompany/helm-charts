@@ -1,4 +1,4 @@
-# rabbitmq helm chart
+# Overview
 This chart installs any application on top of kubernetes cluster.
 For the time being, it's compatible with Openshift 3.11.
 
