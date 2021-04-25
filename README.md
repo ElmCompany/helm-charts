@@ -17,7 +17,7 @@ If so, this chart should answer your needs.
 # Values
 
 Check default Values of this chart [here]( 
-https://bitbucket.elm.sa/projects/SCL/repos/helm-chart-generic-app/browse/rabbitmq/values.yaml)
+https://bitbucket.elm.sa/projects/SCL/repos/helm-chart-generic-app/browse/generic-app/values.yaml)
 
 # How to install the app 
 
