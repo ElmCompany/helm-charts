@@ -1,0 +1,251 @@
+# Default values for single-page-app.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+openshift: true
+replicaCount: 1
+## redirect all HTTP requests to single page (index.html)
+spa: true
+image:
+  ## tag: latest (check image tag pushed by pipeline service after build)
+  tag:
+  ## One of two is REQUIRED: either image.repository or image.stream...and NOT both
+  ## repository: .e.g. nexus.elm.sa/zaw-snapshots/myapp
+  ##            it's the full image name , except the tag
+  ##             Useful if the image is outside the internal
+  ##             registry of the OCP cluster (e.g. dev, qa)
+  ##        (check image repo pushed by pipeline service after build)
+  repository:
+  ## pullSecret: if repository is private, use pullSecret
+  ##             defaults to nexus
+  pullSecret: 'nexus'
+  ## imagestream - relative to the Cluster where resources will be deployed
+  ##               useful if the image is inside the internal
+  ##               registry of the OCP cluster (.e.g staging, prod)
+  ##   for example, if the image is availabe in OCP internal registry under
+  ##    this name: "registry.rnd-apps.elm.sa/elm-images/myapp:v1.0.0"
+  ##    then: 
+  # stream:
+  #   name: myapp
+  #   namespace: elm-images
+  stream:
+    ## imagestream resource name
+    name:
+    ## namespace like: elm-images or openshift : depends where is your imagestream
+    ## it defaults to namespace of the RELEASE
+    namespace:
+    registry: docker-registry.default.svc:5000
+
+### registry secret ###
+# if .image.repository points to a repository from nexus.elm.sa, 
+# then, .nexus.enabled must equals true in order to authenticate
+# your namespace/project to Nexus container registry
+nexus:
+  enabled: false
+  host: nexus.elm.sa
+  fullnameOverride: nexus
+webOptimize:
+  gzip: true
+
+####
+## Environment Variables to be populated inside the container of the app
+# envVars:
+#   SPRING_LOCATION_CONFIG: /opt/app.yaml
+#   SMS_API_PASSWORD: xBlah
+#   REACT_APP_API_URL: https://api.example.com/v2
+envVars: {}
+
+### Specify initContainer params which 
+## takes env vars with specific prefix,
+## then, it generates a javascript file
+jsEnvFileGenerator:
+  ## depends on how you import script in index.html
+  ## default value below reflects <script src="/assets/conf/env.js" />
+  ## in index.html
+  # filename: env.js
+  filename: 
+  mount: /usr/share/nginx/html/assets/conf
+  ## help the generator to render only env vars which starts by:
+  envVarsPrefix: NG_APP_
+  # envVarsPrefix: REACT_APP_
+
+  ### Starter JS code which will be used by the generator
+  ## to attach the computed JS object
+  ## defaults to: window.process=(window.process||{});window.process.env
+  ## .i.e
+  # jsObjectPrefix: window._env=window._env||{};window._env
+  jsObjectPrefix:
+
+  ## TODO - for now same app image will be reused as initContainer
+  # image:
+  #   tag: 4ea
+  #   repository: nexus.elm.sa/abdennour/dotenv-to-js-object
+  #   stream:
+  #     name:
+  #     namespace: openshift # or may be elm-images
+  #     registry: docker-registry.default.svc:5000
+### more props about deployment ###  
+deployment:
+  ## about how many replicaset should be kept in the history
+  revisionHistoryLimit: 5
+  ## triggers for auto rolling-update pods.
+  triggers:
+    imageStreamChange: true
+## your app port (container port)
+# port: 5000 # maybe for python app
+# port: 3000 # maybe for nodejs, react app,.. so on
+port: 8080
+extraPorts: []
+## Assiging public Hostname to your app
+route:
+  enabled: false
+  ## domain: dev-apps.elm.sa
+  ## if you specify domain, the chart will automatically calculate
+  ## the subdomain , then the full hostname will be subdomain.domain
+  domain:
+  ## specify the exact hostname as you want 
+  ## without delegating it to the automation
+  host:
+  extraHosts: []
+
+
+serviceAccount:
+  ## Specifies whether a service account should be created
+  create: false
+  ## Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+## livenessProbe ##
+## How to know that your app is alive. If it's not alive, it will keep restarting
+##   more details: oc explain dc.spec.template.spec.containers.livenessProbe
+## If you do want to specify resources, uncomment the following
+## lines, adjust them as necessary, and remove the curly braces after 'livenessProbe:'.
+livenessProbe: {}
+  # httpGet:
+  #   path: /healthz
+  #   port: http
+## full example
+  # httpGet:
+  #   path: /healthz
+  #   port: http
+  # successThreshold: 1
+  # failureThreshold: 3
+  # periodSeconds: 10 # How often (in seconds) to perform the probe
+  # initialDelaySeconds: 30  # Helpful for long app startup
+  # timeoutSeconds: 1
+## another -livenessProbe example - based on local command instead of rest call
+  # exec:
+  #   command:
+  #    - pgrep
+  #    - java
+## another -livenessProbe example - based on tcp instead of layer 7
+  # tcpSocket:
+  #   port: 6379
+
+## readinessProbe ##
+## How to know that your app is READY to receive traffic?
+## If it's not ready, endpoint between service/pod will not be created 
+##    then traffic will not be forwarded to the pod
+##    more details: oc explain dc.spec.template.spec.containers.readinessProbe
+## If you do want to specify resources, uncomment the following
+## lines, adjust them as necessary, and remove the curly braces after 'readinessProbe:'.
+readinessProbe: {}
+  # httpGet:
+  #   path: /healthz
+  #   port: http
+## check also all livenessProbe examples, they have same fields but not same purpose
+
+## We usually recommend not to specify default resources and to leave this as a conscious
+## choice for the user. This also increases chances charts run on environments with little
+## resources, such as Minikube. If you do want to specify resources, uncomment the following
+## lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+## securityContext Pod Level:
+## Get fields of this value by running "oc explain dc.spec.template.spec.securityContext"
+## If you do want to specify resources, uncomment the following
+## lines, adjust them as necessary, and remove the curly braces after 'securityContext:'.
+securityContext: {}
+rollout:
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nameOverride: ""
+fullnameOverride: ""
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+########### Additional Resources ############
+## initContainers
+## it's List / Array
+initContainers:
+  # - name: env-generator
+  #   image: nexus.elm.sa/abdennour/dotenv-to-js-object:4ea
+  #   args:
+  #     - --dest=/data
+  #     - --env-vars-filter=REACT_APP_
+  #     - --run-as=job
+  #   volumeMounts:
+  #     - name: data-env
+  #       mountPath: /data
+  #   envFrom:
+  #     - secretRef:
+
+## additional volumeMounts
+## it's List / Array
+volumeMounts:
+  # - name: data-env
+  #   mountPath: /usr/share/nginx/html/config
+## additional volumes
+## it's list / Array
+volumes:
+  # - name: data-env
+  #   emptyDir: {}
+
+networkPolicy:
+  3scale:
+    enabled: false
+    namespace: 3scale
+    labels:
+      app: APIcast

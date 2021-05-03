@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "single-page-app.fullname" . }}
+  labels:
+    {{- include "single-page-app.labels" . | nindent 4 }}
+spec:
+  ports:
+  - name: tcp-{{ .Values.port }}
+    port: {{ .Values.port }}
+    protocol: TCP
+    targetPort: {{ .Values.port }}
+  selector:
+    {{- include "single-page-app.labels" . | nindent 4 }}
+    deploymentconfig: {{ include "single-page-app.fullname" . }}
+  sessionAffinity: None
+  type: ClusterIP
