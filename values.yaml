@@ -74,6 +74,13 @@ route:
 #   REACT_APP_API_URL: https://api.example.com/v2
 envVars: {}
 ####
+## Environment Variables where 
+##   its values has been SEALED with kubeseal:
+##     https://wiki.elm.sa/display/TAKS/kubeseal
+# envVarsSealed:
+#   DB_PASS: AgAhm1kcbWFHW......
+envVarsSealed: {}
+####
 ### configFile is useful to mount a whole config file ###
 configFile:
   name: # application.properties

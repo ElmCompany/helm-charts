@@ -38,7 +38,12 @@ spec:
         {{- include "generic-app.labels" . | nindent 8 }}
         deploymentconfig: {{ include "generic-app.fullname" . }}
       annotations:
+      {{- if .Values.envVars }}
         checksum/configenvvars: {{ include (print $.Template.BasePath "/secret-env-vars.yaml") . | sha256sum }}
+      {{- end }}
+      {{- if .Values.envVarsSealed }}
+        checksum/configenvvarssealed: {{ include (print $.Template.BasePath "/secret-env-vars-sealed.yaml") . | sha256sum }}
+      {{- end }}
       {{- if .Values.configFile.name }}
         checksum/configfile: {{ include (print $.Template.BasePath "/configmap-file.yaml") . | sha256sum }}
       {{- end }}
@@ -70,10 +75,16 @@ spec:
         {{- end }}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
-        {{- with .Values.envVars }}
+        {{- if or .Values.envVars .Values.envVarsSealed }}
         envFrom:
+        {{- end }}
+        {{- with .Values.envVars }}
           - secretRef:
               name: {{ include "generic-app.fullname" $ }}-env-vars
+        {{- end }}
+        {{- with .Values.envVarsSealed }}
+          - secretRef:
+              name: {{ include "generic-app.fullname" $ }}-env-vars-sealed
         {{- end }}
         volumeMounts:
 {{- if .Values.volumeMounts }}

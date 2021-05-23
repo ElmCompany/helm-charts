@@ -42,6 +42,10 @@ dependencies: # A list of the chart requirements (optional)
     repository: https://nexus.elm.sa/repository/charts
     condition: nexus.enabled
     alias: nexus
+
+sources:
+  - https://bitbucket.elm.sa/scm/scl/helm-chart-generic-app.git
+
 maintainers:
 - name: abdennour
   email: atoumi@elm.sa
