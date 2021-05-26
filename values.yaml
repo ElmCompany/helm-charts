@@ -80,6 +80,16 @@ envVars: {}
 # envVarsSealed:
 #   DB_PASS: AgAhm1kcbWFHW......
 envVarsSealed: {}
+### sealScope:
+## One of 3 values: cluster-wide, namespace-wide or strict
+### if cluster-wide, you have to kubeseal with --scope cluster-wide.. so on
+##  More details:   https://wiki.elm.sa/display/TAKS/kubeseal
+sealScope: cluster-wide
+# https://github.com/bitnami-labs/sealed-secrets#scopes
+sealScopes:
+  - cluster-wide
+  - namespace-wide
+  - strict
 ####
 ### configFile is useful to mount a whole config file ###
 configFile:

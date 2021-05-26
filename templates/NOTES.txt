@@ -20,3 +20,21 @@
   echo "Visit http://127.0.0.1:8080 to use your application"
   {{ $kubeclient }} --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:80
 {{- end }}
+
+{{- if .Values.envVarsSealed }}
+You are providing values for "envVarsSealed": 
+Make sure that you encrypted it in the right way:
+{{- if .Values.sealScopeClusterWide }}
+echo -n YOUR_CLEAR_VALUE | \
+  kubeseal --cert https://seal.dev-apps.elm.sa/v1/cert.pem \
+  --raw --from-file=/dev/stdin \
+  --scope cluster-wide
+{{- else }}
+echo -n YOUR_CLEAR_VALUE | \
+  kubeseal --cert https://seal.dev-apps.elm.sa/v1/cert.pem \
+  --raw --from-file=/dev/stdin \
+  --scope namespace-wide \
+  --namespace {{ .Release.Namespace }} --name 
+{{- end }}
+
+{{- end }}

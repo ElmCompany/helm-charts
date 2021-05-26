@@ -93,3 +93,9 @@ host name
 {{- end }}
 {{- end }}
 
+{{/*
+seal scopes
+*/}}
+{{- define "generic-app.seal-scopes" -}}
+{{- list "cluster-wide" "namespace-wide" "strict" }}
+{{- end }}
