@@ -99,6 +99,10 @@ spec:
           - name: pvc-1
             mountPath: {{ .Values.persistence.mount }} 
         {{- end }}
+        {{- if .Values.extraPersistence.enabled }}
+          - name: pvc-2
+            mountPath: {{ .Values.extraPersistence.mount }} 
+        {{- end }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
@@ -119,6 +123,11 @@ spec:
         - name: pvc-1
           persistentVolumeClaim:
             claimName: {{ include "generic-app.fullname" . }}
+      {{- end }}
+      {{- if .Values.extraPersistence.enabled }}
+        - name: pvc-2
+          persistentVolumeClaim:
+            claimName: {{ include "generic-app.fullname" . }}-extra
       {{- end }}
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}

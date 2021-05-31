@@ -223,6 +223,17 @@ persistence:
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
   ## If undefined (the default) or set to null, no storageClassName spec is
   storageClass:
+# 2nd PVC if needed
+extraPersistence:
+  enabled: false
+  mount: # .e.g /var/lib/redis/data
+  size: 1Gi
+  accessMode: ReadWriteMany # or ReadWriteOnce
+  ## jenkins data Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  storageClass:
 ########### Additional Resources ############
 ## initContainers
 ## it's List / Array

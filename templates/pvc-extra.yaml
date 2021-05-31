@@ -1,0 +1,23 @@
+{{ if .Values.extraPersistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "generic-app.fullname" . }}-extra
+  labels:
+    {{- include "generic-app.labels" . | nindent 4 }}
+  # finalizers:
+  # - kubernetes.io/pvc-protection
+spec:
+  accessModes:
+  - {{ .Values.extraPersistence.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.extraPersistence.size }}
+{{- if .Values.extraPersistence.storageClass }}
+{{- if (eq "-" .Values.extraPersistence.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ .Values.extraPersistence.storageClass }}"
+{{- end }}
+{{- end }}
+{{ end }}
