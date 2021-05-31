@@ -223,6 +223,8 @@ persistence:
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
   ## If undefined (the default) or set to null, no storageClassName spec is
   storageClass:
+  # PV name
+  volumeName:
 # 2nd PVC if needed
 extraPersistence:
   enabled: false
@@ -234,6 +236,8 @@ extraPersistence:
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
   ## If undefined (the default) or set to null, no storageClassName spec is
   storageClass:
+  # PV name
+  volumeName:
 ########### Additional Resources ############
 ## initContainers
 ## it's List / Array

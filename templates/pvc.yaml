@@ -8,6 +8,9 @@ metadata:
   # finalizers:
   # - kubernetes.io/pvc-protection
 spec:
+{{- if .Values.persistence.volumeName }}
+  volumeName: {{ .Values.persistence.volumeName }}
+{{- end }}
   accessModes:
   - {{ .Values.persistence.accessMode }}
   resources:
