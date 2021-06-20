@@ -118,6 +118,9 @@ podAnnotations: {}
 podSecurityContext: {}
   # fsGroup: 2000
 
+# runAsUser: 1001
+runAsUser:
+
 securityContext: {}
   # capabilities:
   #   drop:
@@ -271,3 +274,41 @@ networkPolicy:
     namespace: 3scale
     labels:
       app: APIcast
+cronjob:
+  enabled: false
+  image:
+    # .i.e: nexus.elm.sa/myproject/myapp
+    repository:
+    # .i.e: 1.0.0-er3299
+    tag:
+    pullPolicy: IfNotPresent
+    # i.e: nexus
+    pullSecret:
+  restartPolicy: Always # OnFailure
+  ## command ------------
+  # command:
+  # - python
+  # - /var/www/app/tamm_job.py
+  command: []
+  # runAsUser: 1000330000 # as example
+  runAsUser:
+  # schedule: '*/5 * * * *' # for example, every 5 minutes
+  schedule:
+  concurrencyPolicy: Allow # or Forbid
+  mountAppEnvVars: false
+  # persistentMountPath: /data/dir1 
+  persistentMountPath:
+  # extraPersistenceMountPath: /data/dir2 
+  extraPersistenceMountPath:
+  ## podSecurityContext (same level as containers not under containers)
+  ## .i.e:
+  # podSecurityContext:
+  #   securityContext:
+  #     fsGroup: 1000330000
+  #     seLinuxOptions:
+  #       level: s0:c18,c12
+  #     supplementalGroups:
+  #     - 0
+  #     - 2000
+  #     - 1000320000
+  podSecurityContext: {}

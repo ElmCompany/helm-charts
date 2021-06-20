@@ -86,6 +86,10 @@ spec:
           - secretRef:
               name: {{ include "generic-app.fullname" $ }}-env-vars-sealed
         {{- end }}
+        {{- if .Values.runAsUser }}
+        securityContext:
+          runAsUser: {{ .Values.runAsUser }}
+        {{- end }}
         volumeMounts:
 {{- if .Values.volumeMounts }}
 {{ tpl (toYaml .Values.volumeMounts | indent 10) . }}
@@ -106,6 +110,10 @@ spec:
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
 {{- if .Values.volumes }}
 {{ tpl (toYaml .Values.volumes | indent 8) . }}
