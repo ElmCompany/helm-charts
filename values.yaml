@@ -44,6 +44,8 @@ nexus:
 
 ### more props about deployment ###  
 deployment:
+  enabled: true
+  mountEnvVars: true
   ## about how many replicaset should be kept in the history
   revisionHistoryLimit: 5
   ## triggers for auto rolling-update pods.
@@ -219,6 +221,7 @@ affinity: {}
 persistence:
   enabled: false
   mount: # .e.g /var/lib/redis/data
+  readOnly: false
   size: 1Gi
   accessMode: ReadWriteMany # or ReadWriteOnce
   ## jenkins data Persistent Volume Storage Class
@@ -232,6 +235,7 @@ persistence:
 extraPersistence:
   enabled: false
   mount: # .e.g /var/lib/redis/data
+  readOnly: false
   size: 1Gi
   accessMode: ReadWriteMany # or ReadWriteOnce
   ## jenkins data Persistent Volume Storage Class
@@ -295,11 +299,14 @@ cronjob:
   # schedule: '*/5 * * * *' # for example, every 5 minutes
   schedule:
   concurrencyPolicy: Allow # or Forbid
-  mountAppEnvVars: false
+  mountEnvVars: true
   # persistentMountPath: /data/dir1 
   persistentMountPath:
   # extraPersistenceMountPath: /data/dir2 
   extraPersistenceMountPath:
+  # readonly mount ?
+  persistentMountReadOnly: false
+  extraPersistenceMountReadOnly: false
   ## podSecurityContext (same level as containers not under containers)
   ## .i.e:
   # podSecurityContext:

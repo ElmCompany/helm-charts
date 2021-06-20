@@ -26,7 +26,7 @@ spec:
             securityContext:
               runAsUser: {{ .Values.cronjob.runAsUser }}
           {{- end }}
-          {{- if .Values.cronjob.mountAppEnvVars }}
+          {{- if .Values.cronjob.mountEnvVars }}
             {{- if or .Values.envVars .Values.envVarsSealed }}
             envFrom:
             {{- end }}
@@ -45,10 +45,12 @@ spec:
             {{- if .Values.cronjob.persistentMountPath }}
             - mountPath: {{ .Values.cronjob.persistentMountPath }}
               name: pvc-1
+              readOnly: {{ .Values.cronjob.persistentMountReadOnly }}
             {{- end }}
             {{- if .Values.cronjob.extraPersistentMountPath }}
             - mountPath: {{ .Values.cronjob.extraPersistentMountPath }}
               name: pvc-2
+              readOnly: {{ .Values.cronjob.extraPersistentMountReadOnly }}
             {{- end }}
             # Optional part:
             #env:

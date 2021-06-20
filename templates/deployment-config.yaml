@@ -1,3 +1,4 @@
+{{ if .Values.deployment.enabled }}
 apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
 metadata:
@@ -33,7 +34,7 @@ spec:
       updatePeriodSeconds: 1
     type: Rolling
   template:
-    metadata:  
+    metadata:
       labels:
         {{- include "generic-app.labels" . | nindent 8 }}
         deploymentconfig: {{ include "generic-app.fullname" . }}
@@ -75,6 +76,7 @@ spec:
         {{- end }}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
+      {{- if .Values.deployment.mountEnvVars }}
         {{- if or .Values.envVars .Values.envVarsSealed }}
         envFrom:
         {{- end }}
@@ -86,6 +88,7 @@ spec:
           - secretRef:
               name: {{ include "generic-app.fullname" $ }}-env-vars-sealed
         {{- end }}
+      {{- end }}
         {{- if .Values.runAsUser }}
         securityContext:
           runAsUser: {{ .Values.runAsUser }}
@@ -101,11 +104,13 @@ spec:
         {{- end }}
         {{- if .Values.persistence.enabled }}
           - name: pvc-1
-            mountPath: {{ .Values.persistence.mount }} 
+            mountPath: {{ .Values.persistence.mount }}
+            readOnly: {{ .Valeus.persistence.readOnly }}
         {{- end }}
         {{- if .Values.extraPersistence.enabled }}
           - name: pvc-2
-            mountPath: {{ .Values.extraPersistence.mount }} 
+            mountPath: {{ .Values.extraPersistence.mount }}
+            readOnly: {{ .Valeus.extraPersistence.readOnly }}
         {{- end }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
@@ -152,3 +157,4 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
   test: false
+{{- end }}
