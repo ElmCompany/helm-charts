@@ -33,6 +33,10 @@ image:
     namespace:
     registry: docker-registry.default.svc:5000
 
+# alternative of entrypoint in docker-compose
+command: []
+# alternative of command in docker-compose
+args: []
 ### registry secret ###
 # if .image.repository points to a repository from nexus.elm.sa, 
 # then, .nexus.enabled must equals true in order to authenticate

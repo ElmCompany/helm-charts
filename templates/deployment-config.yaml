@@ -60,6 +60,14 @@ spec:
       containers:
       - name: {{ include "generic-app.fullname" . }}
         imagePullPolicy: Always
+        {{- if .Values.command }}
+        command:
+          {{ toYaml .Values.command | indent 10 }}
+        {{- end }}
+        {{- if .Values.args }}
+        args:
+          {{ toYaml .Values.args | indent 10 }}
+        {{- end }}
         ports:
         - name: http
           containerPort: {{ .Values.port }}
@@ -105,12 +113,12 @@ spec:
         {{- if .Values.persistence.enabled }}
           - name: pvc-1
             mountPath: {{ .Values.persistence.mount }}
-            readOnly: {{ .Valeus.persistence.readOnly }}
+            readOnly: {{ .Values.persistence.readOnly }}
         {{- end }}
         {{- if .Values.extraPersistence.enabled }}
           - name: pvc-2
             mountPath: {{ .Values.extraPersistence.mount }}
-            readOnly: {{ .Valeus.extraPersistence.readOnly }}
+            readOnly: {{ .Values.extraPersistence.readOnly }}
         {{- end }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
