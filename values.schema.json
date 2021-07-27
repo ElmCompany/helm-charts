@@ -86,13 +86,13 @@
         },
         "port": {
             "type": "integer",
-            "minimum": 1025,
+            "minimum": 1,
             "maximum": 9999
         },
         "replicaCount": {
             "type": "integer",
             "minimum": 0,
-            "maximum": 6
+            "maximum": 10
         },
         "resources": {
             "type": "object"
