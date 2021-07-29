@@ -49,6 +49,10 @@ spec:
         checksum/configfile: {{ include (print $.Template.BasePath "/configmap-file.yaml") . | sha256sum }}
       {{- end }}
     spec:
+    {{- if .Values.serviceAccount.create }}
+      serviceAccount: {{ include "generic-app.serviceAccountName" . }}
+      serviceAccountName: {{ include "generic-app.serviceAccountName" . }}
+    {{- end }}
     {{- if .Values.image.repository }}
       imagePullSecrets:
         - name: {{ .Values.image.pullSecret }}
