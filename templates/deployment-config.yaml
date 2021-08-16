@@ -53,7 +53,7 @@ spec:
       serviceAccount: {{ include "generic-app.serviceAccountName" . }}
       serviceAccountName: {{ include "generic-app.serviceAccountName" . }}
     {{- end }}
-    {{- if .Values.image.repository }}
+    {{- if .Values.image.pullSecret }}
       imagePullSecrets:
         - name: {{ .Values.image.pullSecret }}
     {{- end }}
