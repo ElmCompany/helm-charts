@@ -117,7 +117,6 @@ spec:
         {{- if .Values.persistence.enabled }}
           - name: pvc-1
             mountPath: {{ .Values.persistence.mount }}
-            readOnly: {{ .Values.persistence.readOnly }}
         {{- end }}
         {{- if .Values.extraPersistence.enabled }}
           - name: pvc-2
