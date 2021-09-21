@@ -238,6 +238,9 @@ persistence:
 # 2nd PVC if needed
 extraPersistence:
   enabled: false
+  ## A manually managed Persistent Volume and Claim
+  ## If defined, PVC must be created manually before volume will be bound
+  existingClaim:
   mount: # .e.g /var/lib/redis/data
   readOnly: false
   size: 1Gi

@@ -146,7 +146,7 @@ spec:
       {{- if .Values.persistence.enabled }}
         - name: pvc-1
           persistentVolumeClaim:
-            claimName: {{ include "generic-app.fullname" . }}
+            claimName: {{ .Values.persistence.existingClaim | default (include "generic-app.fullname" .) }}
       {{- end }}
       {{- if .Values.extraPersistence.enabled }}
         - name: pvc-2
