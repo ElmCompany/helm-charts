@@ -72,7 +72,7 @@ Create the name of the service account to use
 
 
 {{/*
-host name
+image repo
 */}}
 {{- define "generic-app.imageRepo" -}}
 {{- if .Values.image.repository }}
@@ -91,6 +91,14 @@ host name
 {{- else if .Values.route.domain }}
 {{- printf "%s-%s.%s" .Release.Namespace .Release.Name .Values.route.domain }}
 {{- end }}
+{{- end }}
+
+{{/*
+all host names
+*/}}
+{{- define "generic-app.hosts" -}}
+{{- $hosts := prepend .Values.route.extraHosts (include "generic-app.host" . ) }}
+{{- join "@" $hosts }}
 {{- end }}
 
 {{/*
