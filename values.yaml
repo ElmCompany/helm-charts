@@ -49,6 +49,8 @@ nexus:
 ### more props about deployment ###  
 deployment:
   enabled: true
+  ## the kind of deployment : Deployment or DeploymentConfig
+  kind: Deployment
   mountEnvVars: true
   ## about how many replicaset should be kept in the history
   revisionHistoryLimit: 5

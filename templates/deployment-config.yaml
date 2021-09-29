@@ -1,4 +1,5 @@
 {{ if .Values.deployment.enabled }}
+{{- if eq .Values.deployment.kind "DeploymentConfig" }}
 apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
 metadata:
@@ -168,4 +169,5 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
   test: false
+{{- end }}
 {{- end }}
