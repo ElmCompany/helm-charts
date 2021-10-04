@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 openshift: true
-replicaCount: 1
+replicaCount: 2
 ## redirect all HTTP requests to single page (index.html)
 spa: true
 image:
@@ -85,6 +85,8 @@ jsEnvFileGenerator:
   #     registry: docker-registry.default.svc:5000
 ### more props about deployment ###  
 deployment:
+  ## the kind of deployment : Deployment or DeploymentConfig
+  kind: Deployment
   ## about how many replicaset should be kept in the history
   revisionHistoryLimit: 5
   ## triggers for auto rolling-update pods.
@@ -106,7 +108,8 @@ route:
   ## without delegating it to the automation
   host:
   extraHosts: []
-
+  secure: true
+  termination: edge
 
 serviceAccount:
   ## Specifies whether a service account should be created

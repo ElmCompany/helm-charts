@@ -1,20 +1,28 @@
 {{- if .Values.route.enabled -}}
+{{- range $index,$host := ( splitList "@" (include "single-page-app.hosts" . )) }}
+---
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: {{ include "single-page-app.fullname" . }}
+  {{- if eq $index 0 }}
+  name: {{ include "single-page-app.fullname" $ }}
+  {{- else }}
+  name: {{ include "single-page-app.fullname" $ }}-extra{{ $index }}  
+  {{- end }}
   labels:
-    {{- include "single-page-app.labels" . | nindent 4 }}
+    {{- include "single-page-app.labels" $ | nindent 4 }}
 spec:
-  host: {{ include "single-page-app.host" . }}
+  host: {{ $host }}
+  {{- if $.Values.route.secure }}
   tls:
-    termination: edge
+    termination: {{ $.Values.route.termination }}
+  {{- end }}
   port:
-    targetPort: tcp-{{ .Values.port }}
+    targetPort: tcp-{{ $.Values.port }}
   to:
     kind: Service
-    name: {{ include "single-page-app.fullname" . }}
+    name: {{ include "single-page-app.fullname" $ }}
     weight: 100
   wildcardPolicy: None
-    
+{{- end }}
 {{- end }}

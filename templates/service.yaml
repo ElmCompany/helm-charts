@@ -11,7 +11,6 @@ spec:
     protocol: TCP
     targetPort: {{ .Values.port }}
   selector:
-    {{- include "single-page-app.labels" . | nindent 4 }}
-    deploymentconfig: {{ include "single-page-app.fullname" . }}
+    {{- include "single-page-app.selectorLabels" . | nindent 4 }}
   sessionAffinity: None
   type: ClusterIP

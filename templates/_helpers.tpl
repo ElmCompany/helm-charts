@@ -93,3 +93,10 @@ host name
 {{- end }}
 {{- end }}
 
+{{/*
+all host names
+*/}}
+{{- define "single-page-app.hosts" -}}
+{{- $hosts := prepend .Values.route.extraHosts (include "single-page-app.host" . ) }}
+{{- join "@" $hosts }}
+{{- end }}
