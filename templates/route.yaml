@@ -13,8 +13,10 @@ metadata:
     {{- include "generic-app.labels" $ | nindent 4 }}
 spec:
   host: {{ $host }}
+  {{- if $.Values.route.secure }}
   tls:
-    termination: edge
+    termination: {{ $.Values.route.termination }}
+  {{- end }}
   port:
     targetPort: tcp-{{ $.Values.port }}
   to:

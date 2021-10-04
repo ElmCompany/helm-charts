@@ -73,7 +73,12 @@ route:
   ## without delegating it to the automation
   host:
   extraHosts: []
-
+  ## .Values.route.secure
+  ## To enable tls , set secure: true
+  secure: true
+  ## .Values.route.termination
+  ## if it's secure, you can choose the termination
+  termination: edge
 ####
 ## Environment Variables to be populated inside the container of the app
 # envVars:
