@@ -24,7 +24,10 @@ For any other Pod 'x' in namespace 'y' wants to use this daemon, make sure to do
 
 1. namespace 'y' is mentioned in `sshClient.namespaces` array. i.e. sshClient.namespaces=['y']
 
-2. the pod 'x' define an extra volume from the configMap {{ include "docker-dind-sshd.fullname" $ }}-ssh-dir
+2. the pod/container 'x' has at least 2 executables : `ssh` client (openssh-client) +  docker client (docker )
+  i.e. : {{ .Values.sshClient.podExample.imageRepository }}:{{ .Values.sshClient.podExample.imageTag }}
+
+3. the pod 'x' define an extra volume from the configMap {{ include "docker-dind-sshd.fullname" $ }}-ssh-dir
 
 ```
   volumes:
@@ -32,14 +35,14 @@ For any other Pod 'x' in namespace 'y' wants to use this daemon, make sure to do
     configMap:
       name: {{ include "docker-dind-sshd.fullname" $ }}-ssh-dir
 ```
-3. the pod/container 'x' mounts the volume as following: 
+4. the pod/container 'x' mounts the volume as following: 
 
 ```
     - name: docker-ssh-files
       mountPath: {{ $.Values.sshClient.mountPath }}
 ```
 
-4. the pod/container 'x' lifecycle (postStart) should be :
+5. the pod/container 'x' lifecycle (postStart) should be :
 
 ```
     lifecycle:

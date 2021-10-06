@@ -54,6 +54,7 @@ sshClient:
   ## command to run at the end of script which runs at the lifecycle postStart of the client pod
   ## example:
   # postStartCmd: docker login nexus.nexus -u ci-user -p Aa123456
+  # postStartCmd: http_proxy=proxy.nexus:8082 apk add --update openssh-client
   postStartCmd:
   ### .Values.sshKeys.namespaces
   ## namespaces that require to have the ssh assets (keys, config,...)
