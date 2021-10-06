@@ -1,0 +1,51 @@
+Connect to the docker daemon using this command:
+----
+
+```
+docker context create remote --docker "host=ssh://root@{{ include "docker-dind-sshd.fullname" $ }}.{{ .Release.Namespace }}";
+```
+
+EXAMPLES: 
+In order to see examples below, make sure to :
+ - provide at least one namespace in .Values.sshClient.namespaces
+ - and .Values.sshClient.podExample.enabled to be "true"
+
+-----
+{{- if .Values.sshClient.podExample.enabled }}
+Try to connect to docker clients :
+{{ range $ns := .Values.sshClient.namespaces }}  
+kubectl -n {{ $ns }} exec -it {{ include "docker-dind-sshd.fullname" $ }}-client-example -c docker-client -- docker ps
+{{- end }}
+{{- end }}
+
+----
+
+For any other Pod 'x' in namespace 'y' wants to use this daemon, make sure to do the following : 
+
+1. namespace 'y' is mentioned in `sshClient.namespaces` array. i.e. sshClient.namespaces=['y']
+
+2. the pod 'x' define an extra volume from the configMap {{ include "docker-dind-sshd.fullname" $ }}-ssh-dir
+
+```
+  volumes:
+  - name: docker-ssh-files
+    configMap:
+      name: {{ include "docker-dind-sshd.fullname" $ }}-ssh-dir
+```
+3. the pod/container 'x' mounts the volume as following: 
+
+```
+    - name: docker-ssh-files
+      mountPath: {{ $.Values.sshClient.mountPath }}
+```
+
+4. the pod/container 'x' lifecycle (postStart) should be :
+
+```
+    lifecycle:
+      postStart:
+        exec:
+          command:
+          - sh
+          - {{ $.Values.sshClient.mountPath }}/post-start.sh
+```
