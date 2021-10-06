@@ -1,7 +1,21 @@
 apiVersion: v2
 name: docker-dind-sshd
-description: A Helm chart for Kubernetes
+description: |
+  Deploy Remote Docker Daemon exposed thru SSH.
+  Architecture details: https://do.elm.sa/aa0o9
 
+icon: https://themes.devops.elm.sa/icons/generic-app.png
+keywords:
+  - docker
+  - dind
+  - dockerindocker
+  - daemon
+  - sshd
+  - dockercontext
+  - ci
+  - desktop
+  - dockerdaemon
+  - dockercontextssh
 # A chart can be either an 'application' or a 'library' chart.
 #
 # Application charts are a collection of templates that can be packaged into versioned archives
@@ -21,4 +35,4 @@ version: 0.1.0
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "1.16.0"
+appVersion: "20.10.9"

@@ -23,7 +23,7 @@ spec:
       {{- end }}
       initContainers:
         - name: download-docker-cli
-          image: "{{ .Values.dockerClient.image.repository }}:{{ .Values.dockerClient.image.tag }}"
+          image: "{{ .Values.dockerClient.image.repository }}:{{ .Values.dockerClient.image.tag | default .Chart.AppVersion }}"
           command:
             - /bin/sh
           args:
@@ -75,7 +75,7 @@ spec:
           resources:
             {{- toYaml .Values.sshd.resources | nindent 12 }}
         - name: dind
-          image: "{{ .Values.dind.image.repository }}:{{ .Values.dind.image.tag }}"
+          image: '{{ .Values.dind.image.repository }}:{{ .Values.dind.image.tag | default (printf "%s-dind" .Chart.AppVersion) }}'
           args:
           - "--insecure-registry"
           - "nexus.nexus"
