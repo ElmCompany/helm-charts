@@ -187,6 +187,7 @@ cacheCleaner:
   image:
     repository: nexus.elm.sa/docker # nexus.elm.sa/abdennour/docker
     tag: # 20.10-buildx-0.6.3
+  apiVersion: batch/v1beta1
 
 nodeSelector: {}
 

@@ -1,5 +1,5 @@
 {{- if .Values.cacheCleaner.enabled }}
-apiVersion: batch/v1
+apiVersion: {{ .Values.cacheCleaner.apiVersion }}
 kind: CronJob
 metadata:
   name: {{ include "docker-dind-sshd.fullname" $ }}-cache-cleaner
@@ -11,6 +11,10 @@ spec:
     spec:
       template:
         spec:
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           containers:
           - name: cache-cleaner
             image: {{ .Values.cacheCleaner.image.repository }}:{{ .Values.cacheCleaner.image.tag | default .Chart.AppVersion }}
