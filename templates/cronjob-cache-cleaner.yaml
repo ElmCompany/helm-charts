@@ -31,6 +31,7 @@ spec:
               docker image prune -af --filter label={{ .Values.cacheCleaner.byImageLabel }};
               {{- end }}
               docker system prune -af --filter "until={{ .Values.cacheCleaner.until }}";
+              docker builder prune -af --filter "until={{ .Values.cacheCleaner.until }}";
           volumes:
           - name: docker-ssh-files
             configMap:
