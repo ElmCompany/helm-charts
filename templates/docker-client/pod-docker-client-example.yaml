@@ -1,5 +1,6 @@
 {{- if .Values.sshClient.podExample.enabled }}
-{{ range $ns := .Values.sshClient.namespaces }}  
+{{ $namespaces := append .Values.sshClient.namespaces .Release.Namespace }}
+{{ range $ns := $namespaces }}
 ---
 apiVersion: "v1"
 kind: "Pod"

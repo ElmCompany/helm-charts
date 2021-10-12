@@ -25,7 +25,7 @@ sshd:
   ## .Values.sshd.resources
   resources:
     limits:
-      cpu: '100m'
+      cpu: '1000m'
       memory: '256Mi'
     requests:
       memory: '64Mi'
@@ -173,6 +173,20 @@ persistence:
   exsitingClaim:
   storageClass:
   size:
+
+cacheCleaner:
+  enabled: false
+  ## .Values.cacheCleaner.schedule
+  ##    job will be run periodically as per this value
+  schedule: '*/5 * * * *'
+  ## .Values.cacheCleaner.until
+  ##    only clean docker objects before this value. 
+  ## and keep objects after that value
+  until: 24h
+  byImageLabel: # imagenature=builtbyci
+  image:
+    repository: nexus.elm.sa/docker # nexus.elm.sa/abdennour/docker
+    tag: # 20.10-buildx-0.6.3
 
 nodeSelector: {}
 
