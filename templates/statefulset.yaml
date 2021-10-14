@@ -79,6 +79,8 @@ spec:
           args:
           - "--insecure-registry"
           - "nexus.nexus"
+          - "--storage-driver" 
+          - "overlay2"
           resources:
             {{- toYaml .Values.dind.resources | nindent 12 }}
           securityContext:
