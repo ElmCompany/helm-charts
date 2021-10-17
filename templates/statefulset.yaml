@@ -103,7 +103,10 @@ spec:
           hostPath:
             path: {{ tpl .Values.persistence.hostPath . }}
             type: "DirectoryOrCreate"
-  {{- end }}      
+  {{- else }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "docker-dind-sshd.fullname" .) }}
+  {{- end }}
 {{- else }}
           emptyDir: {}
 {{- end }}
