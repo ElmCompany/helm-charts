@@ -169,10 +169,20 @@ resources: {}
 ## persistence for the docker storage
 persistence:
   enabled: true
-  hostPath: /opt/pods-{{ .Chart.Name }}-{{ .Release.Name }}
+  ## for hostPath VOl
+  hostPath: # /opt/pods-{{ .Chart.Name }}-{{ .Release.Name }}
+  ## exsting
   exsitingClaim:
+  ## for new PVC:
+  size: 300Gi
+  accessMode: ReadWriteOnce # or ReadWriteOnce ReadWriteMany
+  ## jenkins data Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ## in k8s devops.elm.sa, there are : nfs-client, nfs-sea
+  ## in general check output of : kubectl get sc (of your cluster)
   storageClass:
-  size:
 
 cacheCleaner:
   enabled: false
