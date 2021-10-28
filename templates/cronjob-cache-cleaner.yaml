@@ -7,6 +7,7 @@ metadata:
     {{- include "docker-dind-sshd.labels" $ | nindent 4 }}
 spec:
   schedule: "{{ .Values.cacheCleaner.schedule }}"
+  concurrencyPolicy: Forbid
   jobTemplate:
     spec:
       template:
