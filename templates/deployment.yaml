@@ -15,8 +15,17 @@ spec:
       {{- include "generic-app.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+      {{- if .Values.envVars }}
+        checksum/configenvvars: {{ include (print $.Template.BasePath "/secret-env-vars.yaml") . | sha256sum }}
+      {{- end }}
+      {{- if .Values.envVarsSealed }}
+        checksum/configenvvarssealed: {{ include (print $.Template.BasePath "/secret-env-vars-sealed.yaml") . | sha256sum }}
+      {{- end }}
+      {{- if .Values.configFile.name }}
+        checksum/configfile: {{ include (print $.Template.BasePath "/configmap-file.yaml") . | sha256sum }}
+      {{- end }}
+      {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
