@@ -27,7 +27,7 @@ spec:
             {{- end }}
             {{- if .Values.cronjob.args }}
             args:
-              {{- toYaml .Values.cronjob.args | nindent 10 }}
+              {{- toYaml .Values.cronjob.args | nindent 14 }}
             {{- end }}
             name: job
           {{- if .Values.cronjob.runAsUser }}
