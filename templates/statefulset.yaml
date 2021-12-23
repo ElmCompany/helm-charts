@@ -53,6 +53,18 @@ spec:
                 - sh
                 - -c
                 - cp /shared-bin/docker /usr/bin/docker
+          startupProbe:
+            exec:
+              command:
+              - docker
+              - ps
+            failureThreshold: 10
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 22
+            failureThreshold: 3
+            periodSeconds: 3          
           env:
             # it's id_rsa.pub content of ssh-keygen -t rsa
             - name: AUTHORIZED_KEYS
@@ -86,6 +98,23 @@ spec:
           securityContext:
             privileged: true
           tty: true
+          startupProbe:
+            tcpSocket:
+              port: 2376
+            failureThreshold: 10
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+              - docker
+              - ps
+            failureThreshold: 3
+            periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: 2376
+            failureThreshold: 3
+            periodSeconds: 5
           volumeMounts:
           - mountPath: "/var/lib/docker"
             name: "docker-graph-storage"
