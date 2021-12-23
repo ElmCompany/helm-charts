@@ -16,6 +16,9 @@ dind:
   #   requests:
   #     cpu: "750m"
   resources: {}
+  ### .Values.dind.storageDriver
+  ## possible values: https://docs.docker.com/storage/storagedriver/select-storage-driver/
+  storageDriver: vfs # overlay2
 sshd:
   image:
     repository: nexus.elm.sa/praqma/alpine-sshd
@@ -174,7 +177,7 @@ persistence:
   ## exsting
   exsitingClaim:
   ## for new PVC:
-  size: 300Gi
+  size: 100Gi
   accessMode: ReadWriteOnce # or ReadWriteOnce ReadWriteMany
   ## jenkins data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
@@ -188,7 +191,7 @@ cacheCleaner:
   enabled: false
   ## .Values.cacheCleaner.schedule
   ##    job will be run periodically as per this value
-  schedule: '*/5 * * * *'
+  schedule: '0 1 * * *'
   ## .Values.cacheCleaner.until
   ##    only clean docker objects before this value. 
   ## and keep objects after that value

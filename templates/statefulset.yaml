@@ -79,6 +79,8 @@ spec:
           args:
           - "--insecure-registry"
           - "nexus.nexus"
+          - "--storage-driver"
+          - "{{ .Values.dind.storageDriver }}"
           resources:
             {{- toYaml .Values.dind.resources | nindent 12 }}
           securityContext:
