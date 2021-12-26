@@ -7,7 +7,11 @@ metadata:
     {{- include "generic-app.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
+    {{- if eq .Values.deployment.kind "DeploymentConfig" }}
+    apiVersion: apps.openshift.io/v1
+    {{- else }}
     apiVersion: apps/v1
+    {{- end }}
     kind: {{ .Values.deployment.kind }}
     name: {{ include "generic-app.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
