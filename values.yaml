@@ -74,8 +74,10 @@ route:
   host:
   extraHosts: []
   ## .Values.route.secure
-  ## To enable tls , set secure: true
+  ## To enable tls for host, set secure: true
   secure: true
+  ## To enable tls for extraHosts, set secureExtraHosts: true
+  secureExtraHosts: true
   ## .Values.route.termination
   ## if it's secure, you can choose the termination
   termination: edge

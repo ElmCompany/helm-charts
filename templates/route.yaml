@@ -13,7 +13,11 @@ metadata:
     {{- include "generic-app.labels" $ | nindent 4 }}
 spec:
   host: {{ $host }}
-  {{- if $.Values.route.secure }}
+  {{- if and (eq $index 0) $.Values.route.secure }}
+  tls:
+    termination: {{ $.Values.route.termination }}
+  {{- end }}
+  {{- if and (not (eq $index 0)) ($.Values.route.secureExtraHosts) }}
   tls:
     termination: {{ $.Values.route.termination }}
   {{- end }}
