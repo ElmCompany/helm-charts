@@ -4,7 +4,7 @@ description: |
   Deploy Remote Docker Daemon exposed thru SSH.
   Architecture details: https://do.elm.sa/aa0o9
 
-icon: https://themes.devops.elm.sa/icons/generic-app.png
+icon: https://themes.devops.elm.sa/icons/docker-dind-sshd.png
 keywords:
   - docker
   - dind
@@ -25,6 +25,13 @@ keywords:
 # a dependency of application charts to inject those utilities and functions into the rendering
 # pipeline. Library charts do not define any templates and therefore cannot be deployed.
 type: application
+
+# dependencies: # A list of the chart requirements (optional)
+#   - name: external-service
+#     version: 1.0.1
+#     repository: https://nexus.elm.sa/repository/charts
+#     alias: existingDockerDaemon
+#     condition: existingDockerDaemon.enabled
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.

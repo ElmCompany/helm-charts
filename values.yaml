@@ -19,6 +19,15 @@ dind:
   ### .Values.dind.storageDriver
   ## possible values: https://docs.docker.com/storage/storagedriver/select-storage-driver/
   storageDriver: vfs # overlay2
+
+# .Values.existingDockerDaemon
+### it is about using external Docker Daemon, point to it,,.. instead of provisioing Dind
+existingDockerDaemon:
+  enabled: false
+  ip:
+  port: 22
+  sshUser:
+
 sshd:
   image:
     repository: nexus.elm.sa/praqma/alpine-sshd

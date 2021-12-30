@@ -16,7 +16,7 @@ data:
     mkdir -p -m 600 ~/.ssh;
     cp -rL {{ $.Values.sshClient.mountPath }}/* ~/.ssh;
     chmod 400 ~/.ssh/id_rsa;
-    docker context create remote --docker "host=ssh://root@{{ include "docker-dind-sshd.fullname" $ }}.{{ $.Release.Namespace }}";
+    docker context create remote --docker "host=ssh://{{ include "docker-dind-sshd.sshUser" $ }}@{{ include "docker-dind-sshd.fullname" $ }}.{{ $.Release.Namespace }}";
     docker context use remote;
     {{- if $.Values.sshClient.dockerLoginCmd }}
     {{ $.Values.sshClient.dockerLoginCmd }}

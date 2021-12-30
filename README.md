@@ -1,7 +1,7 @@
 # Overview
 Deploy docker daemon on top of kuberentes with sshd enabled.
 
-Useful for accessing remote docker daemon thru ssh : `docker context create remote --docker "host=ssh://root@SERVICENAME.NAMESPACE"`
+Useful for accessing remote docker daemon thru ssh : `docker context create remote --docker "host=ssh://USER@SERVICENAME.NAMESPACE"`
 
 
 # Values

@@ -60,3 +60,12 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+
+{{- define "docker-dind-sshd.sshUser" -}}
+{{- if .Values.existingDockerDaemon.enabled }}
+{{- .Values.existingDockerDaemon.sshUser }}
+{{- else }}
+{{- print "root" }}
+{{- end }}
+{{- end }}
