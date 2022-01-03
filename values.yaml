@@ -3,6 +3,7 @@
 # Declare variables to be passed into your templates.
 openshift: true
 replicaCount: 2
+
 ## redirect all HTTP requests to single page (index.html)
 spa: true
 image:
@@ -108,9 +109,20 @@ route:
   ## without delegating it to the automation
   host:
   extraHosts: []
+  ## .Values.route.secure
+  ## To enable tls for host, set secure: true
   secure: true
+  ## To enable tls for extraHosts, set secureExtraHosts: true
+  secureExtraHosts: true
+  ## .Values.route.termination
+  ## if it's secure, you can choose the termination
   termination: edge
 
+ingress:
+  enabled: false
+  host: catalog.local
+  annotations:
+    kubernetes.io/ingress.class: nginx
 serviceAccount:
   ## Specifies whether a service account should be created
   create: false

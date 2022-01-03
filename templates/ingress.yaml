@@ -1,0 +1,25 @@
+{{- if and .Values.ingress.enabled (not .Values.openshift) }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "single-page-app.fullname" . }}
+  labels:
+    {{- include "single-page-app.labels" . | nindent 4 }}
+{{- if .Values.ingress.annotations }}
+  annotations:
+  {{- range $key, $value := .Values.ingress.annotations }}
+    {{ $key }}: {{ $value | quote }}
+  {{- end }}
+{{- end }}
+spec:
+  rules:
+  - host: "{{ .Values.ingress.host }}"
+    http:
+      paths:
+      - backend:
+          service:
+            name: {{ include "single-page-app.fullname" . }}
+            port:
+              name: tcp-{{ .Values.port }}
+        pathType: ImplementationSpecific
+{{- end }}
