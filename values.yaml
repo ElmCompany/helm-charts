@@ -236,6 +236,7 @@ persistence:
   mount: # .e.g /var/lib/redis/data
   readOnly: false
   size: 1Gi
+  existingClaim: 
   accessMode: ReadWriteMany # or ReadWriteOnce
   ## jenkins data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>

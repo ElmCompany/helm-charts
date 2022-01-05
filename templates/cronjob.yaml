@@ -80,7 +80,7 @@ spec:
         {{- if .Values.cronjob.persistentMountPath }}
           - name: pvc-1
             persistentVolumeClaim:
-              claimName: {{ include "generic-app.fullname" . }}
+              claimName: {{ .Values.persistence.existingClaim | default (include "generic-app.fullname" .) }}
         {{- end }}
         {{- if .Values.cronjob.extraPersistentMountPath }}
           - name: pvc-2
