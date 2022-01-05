@@ -5,18 +5,18 @@ metadata:
   labels:
     {{- include "docker-dind-sshd.labels" . | nindent 4 }}
 spec:
-{{- if .Values.existingDockerDaemon.enabled }}
   ports:
-    - port: 22
-      targetPort: {{ .Values.existingDockerDaemon.port }}
-{{- else }}
-  ports:
-  - protocol: TCP
-    targetPort: sshd
-    name: sshd
+  - name: sshd
     port: 22
-  selector:
-    app: docker
+    protocol: TCP
+    targetPort: {{ ternary .Values.existingDockerDaemon.port "sshd" .Values.existingDockerDaemon.enabled  }}
+{{- if .Values.sshd.monitoring.enabled }}
+  - name: metrics
+    port: {{ .Values.sshd.monitoring.port }}
+    targetPort: {{ .Values.sshd.monitoring.port }}
+    protocol: TCP
+{{- end }}
+{{- if not  .Values.existingDockerDaemon.enabled }}
   sessionAffinity: None
   type: ClusterIP
   selector:
@@ -34,6 +34,12 @@ subsets:
  - addresses:
     - ip: {{ .Values.existingDockerDaemon.ip  }}
    ports:
-    - port: {{ .Values.existingDockerDaemon.port  }}
-
+    - name: sshd
+      port: {{ .Values.existingDockerDaemon.port }}
+      protocol: TCP
+{{- if .Values.sshd.monitoring.enabled }}
+    - name: metrics
+      port: {{ .Values.sshd.monitoring.port }}
+      protocol: TCP
+{{- end }}
 {{- end }}

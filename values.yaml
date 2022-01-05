@@ -27,6 +27,7 @@ existingDockerDaemon:
   ip:
   port: 22
   sshUser:
+  sshMaxSessions: 100
 
 sshd:
   image:
@@ -41,6 +42,30 @@ sshd:
       memory: '256Mi'
     requests:
       memory: '64Mi'
+  # depends on https://github.com/stfsy/prometheus-what-active-users-exporter/
+  monitoring:
+    enabled: false
+    port: 9090
+    endpoint: /metrics
+    serviceMonitor:
+      # -- Enable a prometheus ServiceMonitor
+      enabled: false
+      # -- Prometheus ServiceMonitor interval
+      interval: 30s
+      # -- Prometheus ServiceMonitor path
+      path: /metrics
+      # -- Prometheus [RelabelConfigs] to apply to samples before scraping
+      relabelings: []
+      # -- Prometheus [MetricRelabelConfigs] to apply to samples before ingestion
+      metricRelabelings: []
+      # -- Prometheus ServiceMonitor selector
+      selector: {}
+        # release: prom
+
+      # -- Prometheus ServiceMonitor namespace
+      namespace: "" # "monitoring"
+      # -- Prometheus ServiceMonitor labels
+      additionalLabels: {}
 
 dockerClient:
   image:

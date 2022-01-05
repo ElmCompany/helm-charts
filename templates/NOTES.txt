@@ -52,3 +52,25 @@ For any other Pod 'x' in namespace 'y' wants to use this daemon, make sure to do
           - sh
           - {{ $.Values.sshClient.mountPath }}/post-start.sh
 ```
+
+{{- if .Values.existingDockerDaemon.enabled }}
+##########
+# Prepare Machine {{ .Values.existingDockerDaemon.ip }} where existing daemon running ##
+########
+
+kubectl -n {{ .Release.Namespace}} get configmap {{ include "docker-dind-sshd.fullname" . }}-helper-scripts \
+  -o jsonpath='{.data.prepare-existing-daemon\.sh}' > prepare-existing-daemon.sh
+scp prepare-existing-daemon.sh {{ .Values.existingDockerDaemon.ip }}:/tmp/
+ssh {{ .Values.existingDockerDaemon.ip }}
+> sudo su -
+> bash /tmp/prepare-existing-daemon.sh
+{{- end }}
+
+{{- if .Values.sshd.monitoring.enabled }}
+kubectl -n {{ .Release.Namespace}} get configmap {{ include "docker-dind-sshd.fullname" . }}-helper-scripts \
+  -o jsonpath='{.data.install-prometheus-exporter-active-ssh-users\.sh}' > install-prometheus-exporter-active-ssh-users.sh
+scp install-prometheus-exporter-active-ssh-users.sh {{ .Values.existingDockerDaemon.ip }}:/tmp/
+ssh {{ .Values.existingDockerDaemon.ip }}
+> sudo su -
+> bash /tmp/install-prometheus-exporter-active-ssh-users.sh
+{{- end }}
