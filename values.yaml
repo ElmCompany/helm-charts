@@ -28,6 +28,29 @@ existingDockerDaemon:
   port: 22
   sshUser:
   sshMaxSessions: 100
+monitoring:
+  enabled: false
+  # "metrics-addr": "0.0.0.0:9999" in /etc/docker/*.json
+  port: 9999
+  serviceMonitor:
+    # -- Enable a prometheus ServiceMonitor
+    enabled: false
+    # -- Prometheus ServiceMonitor interval
+    interval: 30s
+    # -- Prometheus ServiceMonitor path
+    path: /metrics
+    # -- Prometheus [RelabelConfigs] to apply to samples before scraping
+    relabelings: []
+    # -- Prometheus [MetricRelabelConfigs] to apply to samples before ingestion
+    metricRelabelings: []
+    # -- Prometheus ServiceMonitor selector
+    selector: {}
+      # release: prometheus
+
+    # -- Prometheus ServiceMonitor namespace
+    namespace: "" # "monitoring"
+    # -- Prometheus ServiceMonitor labels
+    additionalLabels: {}
 
 sshd:
   image:
@@ -45,8 +68,7 @@ sshd:
   # depends on https://github.com/stfsy/prometheus-what-active-users-exporter/
   monitoring:
     enabled: false
-    port: 9090
-    endpoint: /metrics
+    port: 9839
     serviceMonitor:
       # -- Enable a prometheus ServiceMonitor
       enabled: false
@@ -60,7 +82,7 @@ sshd:
       metricRelabelings: []
       # -- Prometheus ServiceMonitor selector
       selector: {}
-        # release: prom
+        # release: prometheus
 
       # -- Prometheus ServiceMonitor namespace
       namespace: "" # "monitoring"

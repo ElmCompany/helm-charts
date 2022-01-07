@@ -13,7 +13,11 @@ spec:
   endpoints:
   - interval: {{ .Values.sshd.monitoring.serviceMonitor.interval }}
     path: {{ .Values.sshd.monitoring.serviceMonitor.path }}
+    {{- if not (eq .Values.monitoring.port .Values.sshd.monitoring.port) }}
+    port: metrics-sshd
+    {{- else }}
     port: metrics
+    {{- end }}
   namespaceSelector:
     matchNames:
     - {{ .Release.Namespace }}
