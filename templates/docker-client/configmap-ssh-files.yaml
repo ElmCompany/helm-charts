@@ -1,3 +1,4 @@
+{{ $dockerHost := printf "%s.%s" (include "docker-dind-sshd.fullname" .) .Release.Namespace }}
 {{ $namespaces := append .Values.sshClient.namespaces .Release.Namespace }}
 {{ range $ns := $namespaces }}  
 ---
@@ -27,12 +28,14 @@ data:
     {{ $.Values.sshClient.postStartCmd }}
     {{- end }}
   config: |
-    Host {{ include "docker-dind-sshd.fullname" $ }}.{{ $.Release.Namespace }}
+    Host {{ $dockerHost }}
       StrictHostKeyChecking no
       UserKnownHostsFile=/dev/null
     {{- range $host := $.Values.sshClient.extraKnownHosts }}
+    {{- if not (eq $host $dockerHost ) }}
     Host {{ $host }}
       StrictHostKeyChecking no
       UserKnownHostsFile=/dev/null
+    {{- end }}
     {{- end }}
 {{- end }}
