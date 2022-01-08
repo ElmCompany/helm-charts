@@ -100,7 +100,16 @@ dockerClient:
     limits:
       cpu: '100m'
       memory: '64Mi'
-
+  ### .Values.dockerClient.extraDockerContextes
+  ## .i.e
+  # extraDockerContextes:
+  #   - name: pe1-cdx-rv-gs05
+  #     endpoint: ssh://docker@pe1-cdx-rv-gs05.docker
+  #   - name: ci
+  #     endpoint: ssh://ci@192.168.71.43
+  #   - name: spare
+  #     endpoint: tcp://172.55.81.32:2375
+  extraDockerContextes: []
 ## .Values.imagePullSecrets
 ## example:
 # imagePullSecrets:

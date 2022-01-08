@@ -1,4 +1,5 @@
 {{ $dockerHost := printf "%s.%s" (include "docker-dind-sshd.fullname" .) .Release.Namespace }}
+{{ $dockerEndpoint := printf "ssh://%s@%s" (include "docker-dind-sshd.sshUser" .) $dockerHost }}
 {{ $namespaces := append .Values.sshClient.namespaces .Release.Namespace }}
 {{ range $ns := $namespaces }}  
 ---
@@ -17,7 +18,12 @@ data:
     mkdir -p -m 600 ~/.ssh;
     cp -rL {{ $.Values.sshClient.mountPath }}/* ~/.ssh;
     chmod 400 ~/.ssh/id_rsa;
-    docker context create {{ include "docker-dind-sshd.fullname" $ }} --docker "host=ssh://{{ include "docker-dind-sshd.sshUser" $ }}@{{ include "docker-dind-sshd.fullname" $ }}.{{ $.Release.Namespace }}";
+    docker context create {{ include "docker-dind-sshd.fullname" $ }} --docker "host={{ $dockerEndpoint }}";
+    {{- range $dockerContext := $.Values.dockerClient.extraDockerContextes }}
+    {{- if not (eq $dockerContext.endpoint $dockerEndpoint ) }}
+    docker context create {{ $dockerContext.name }} --docker "host={{ $dockerContext.endpoint }}";
+    {{- end }}
+    {{- end }}    
     {{- if $.Values.sshClient.useContext }}
     docker context use {{ include "docker-dind-sshd.fullname" $ }};
     {{- end }}
