@@ -30,4 +30,9 @@ data:
     Host {{ include "docker-dind-sshd.fullname" $ }}.{{ $.Release.Namespace }}
       StrictHostKeyChecking no
       UserKnownHostsFile=/dev/null
+    {{- range $host := $.Values.sshClient.extraKnownHosts }}
+    Host {{ $host }}
+      StrictHostKeyChecking no
+      UserKnownHostsFile=/dev/null
+    {{- end }}
 {{- end }}

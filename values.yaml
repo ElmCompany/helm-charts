@@ -117,9 +117,16 @@ sshClient:
   # postStartCmd: docker login nexus.nexus -u ci-user -p Aa123456
   # postStartCmd: http_proxy=proxy.nexus:8082 apk add --update openssh-client
   postStartCmd:
-  ### .Values.sshKeys.namespaces
+  ### .Values.sshClient.namespaces
   ## namespaces that require to have the ssh assets (keys, config,...)
   namespaces: []
+  ### .Values.sshClient.extraKnownHosts
+  ## i.e.
+  # extraKnownHosts:
+  #   - 10.33.44.39
+  #   - vm-abdennour.guacamole
+  #   - pe1-cdx-rv-gs05.docker
+  extraKnownHosts: []
   podExample:
     enabled: true
     imageRepository: nexus.elm.sa/abdennour/docker-compose
