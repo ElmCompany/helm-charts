@@ -55,19 +55,19 @@ spec:
             - name: http
               containerPort: {{ .Values.port }}
               protocol: TCP
-            {{- if .Values.deployment.mountEnvVars }}
-              {{- if or .Values.envVars .Values.envVarsSealed }}
-              envFrom:
-              {{- end }}
-              {{- with .Values.envVars }}
-                - secretRef:
-                    name: {{ include "generic-app.fullname" $ }}-env-vars
-              {{- end }}
-              {{- with .Values.envVarsSealed }}
-                - secretRef:
-                    name: {{ include "generic-app.fullname" $ }}-env-vars-sealed
-              {{- end }}
-            {{- end }}
+        {{- if .Values.deployment.mountEnvVars }}
+          {{- if or .Values.envVars .Values.envVarsSealed }}
+          envFrom:
+          {{- end }}
+          {{- with .Values.envVars }}
+            - secretRef:
+                name: {{ include "generic-app.fullname" $ }}-env-vars
+          {{- end }}
+          {{- with .Values.envVarsSealed }}
+            - secretRef:
+                name: {{ include "generic-app.fullname" $ }}-env-vars-sealed
+          {{- end }}
+        {{- end }}
           {{- with .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 10 }}
