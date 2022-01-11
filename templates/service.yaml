@@ -11,7 +11,9 @@ spec:
     protocol: TCP
     targetPort: {{ .Values.port }}
   selector:
-    {{- include "generic-app.labels" . | nindent 4 }}
+    {{- include "generic-app.selectorLabels" . | nindent 4 }}
+    {{- if eq .Values.deployment.kind "DeploymentConfig" }}
     deploymentconfig: {{ include "generic-app.fullname" . }}
+    {{- end }}
   sessionAffinity: None
   type: ClusterIP
