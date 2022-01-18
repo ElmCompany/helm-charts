@@ -9,9 +9,9 @@ metadata:
   {{- else }}
   name: {{ include "generic-app.fullname" $ }}-extra{{ $index }}
   {{- end }}
-  {{- if .Values.route.annotations }}
+  {{- with .Values.route.annotations }}
   annotations:
-    {{- toYaml .Values.route.annotations | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
     {{- include "generic-app.labels" $ | nindent 4 }}
