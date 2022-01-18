@@ -9,7 +9,7 @@ metadata:
   {{- else }}
   name: {{ include "generic-app.fullname" $ }}-extra{{ $index }}
   {{- end }}
-  {{- with .Values.route.annotations }}
+  {{- with $.Values.route.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
