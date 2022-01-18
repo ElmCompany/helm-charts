@@ -21,7 +21,7 @@ image:
   ##               registry of the OCP cluster (.e.g staging, prod)
   ##   for example, if the image is availabe in OCP internal registry under
   ##    this name: "registry.rnd-apps.elm.sa/elm-images/myapp:v1.0.0"
-  ##    then: 
+  ##    then:
   # stream:
   #   name: myapp
   #   namespace: elm-images
@@ -38,7 +38,7 @@ command: []
 # alternative of command in docker-compose
 args: []
 ### registry secret ###
-# if .image.repository points to a repository from nexus.elm.sa, 
+# if .image.repository points to a repository from nexus.elm.sa,
 # then, .nexus.enabled must equals true in order to authenticate
 # your namespace/project to Nexus container registry
 nexus:
@@ -46,7 +46,7 @@ nexus:
   host: nexus.elm.sa
   fullnameOverride: nexus
 
-### more props about deployment ###  
+### more props about deployment ###
 deployment:
   enabled: true
   ## the kind of deployment : Deployment or DeploymentConfig
@@ -69,7 +69,7 @@ route:
   ## if you specify domain, the chart will automatically calculate
   ## the subdomain , then the full hostname will be subdomain.domain
   domain:
-  ## specify the exact hostname as you want 
+  ## specify the exact hostname as you want
   ## without delegating it to the automation
   host:
   extraHosts: []
@@ -81,6 +81,9 @@ route:
   ## .Values.route.termination
   ## if it's secure, you can choose the termination
   termination: edge
+  ## .Values.route.annotations
+  annotations: {}
+
 ####
 ## Environment Variables to be populated inside the container of the app
 # envVars:
@@ -89,7 +92,7 @@ route:
 #   REACT_APP_API_URL: https://api.example.com/v2
 envVars: {}
 ####
-## Environment Variables where 
+## Environment Variables where
 ##   its values has been SEALED with kubeseal:
 ##     https://wiki.elm.sa/display/TAKS/kubeseal
 # envVarsSealed:
@@ -177,7 +180,7 @@ livenessProbe: {}
 
 ## readinessProbe ##
 ## How to know that your app is READY to receive traffic?
-## If it's not ready, endpoint between service/pod will not be created 
+## If it's not ready, endpoint between service/pod will not be created
 ##    then traffic will not be forwarded to the pod
 ##    more details: oc explain dc.spec.template.spec.containers.readinessProbe
 ## If you do want to specify resources, uncomment the following
@@ -236,7 +239,7 @@ persistence:
   mount: # .e.g /var/lib/redis/data
   readOnly: false
   size: 1Gi
-  existingClaim: 
+  existingClaim:
   accessMode: ReadWriteMany # or ReadWriteOnce
   ## jenkins data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
@@ -317,9 +320,9 @@ cronjob:
   schedule:
   concurrencyPolicy: Allow # or Forbid
   mountEnvVars: true
-  # persistentMountPath: /data/dir1 
+  # persistentMountPath: /data/dir1
   persistentMountPath:
-  # extraPersistenceMountPath: /data/dir2 
+  # extraPersistenceMountPath: /data/dir2
   extraPersistenceMountPath:
   # readonly mount ?
   persistentMountReadOnly: false
