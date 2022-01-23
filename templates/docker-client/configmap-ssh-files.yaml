@@ -26,7 +26,7 @@ data:
           continue;
         fi
         echo "Checking health of cloudnative build env ${name} ..."
-        DOCKER_CONTEXT=${name} timeout -s 9 $DOCKERTIMEOUT docker system info -f '{{ .Name }}';
+        DOCKER_CONTEXT=${name} timeout -s 9 $DOCKERTIMEOUT docker system info -f '{{`{{ .Name }}`}}';
         if [ $? == "0" ];then
           echo "Selecting ${name} ...."
           export SELECTED=${name};
