@@ -1,0 +1,26 @@
+{{- if and (not .Values.openshift) .Values.route.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "generic-app.fullname" $ }}
+  {{- with .Values.route.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "generic-app.labels" . | nindent 4 }}
+spec:
+  rules:
+  {{- range $index,$host := ( splitList "@" (include "generic-app.hosts" . )) }}
+  - host: {{ $host }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: {{ include "generic-app.fullname" $ }}
+            port:
+              name: http
+        pathType: ImplementationSpecific
+        path: {{ $.Values.route.path }}
+  {{- end -}}
+{{- end -}}

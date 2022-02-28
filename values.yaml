@@ -82,7 +82,12 @@ route:
   ## if it's secure, you can choose the termination
   termination: edge
   ## .Values.route.annotations
+  # annotations:
+  #   nginx.ingress.kubernetes.io/rewrite-target: /scm/$1
   annotations: {}
+  ## .Values.route.path
+  # path: /(.*) # useful when rewrite-target used
+  path: /
 
 ####
 ## Environment Variables to be populated inside the container of the app
