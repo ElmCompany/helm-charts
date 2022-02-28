@@ -19,7 +19,7 @@ spec:
           service:
             name: {{ include "generic-app.fullname" $ }}
             port:
-              name: http
+              name: tcp-{{ $.Values.port }}
         pathType: ImplementationSpecific
         path: {{ $.Values.route.path }}
   {{- end -}}
