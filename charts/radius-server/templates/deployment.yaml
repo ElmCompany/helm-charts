@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "radius-server.fullname" . }}
+  labels:
+    {{- include "radius-server.labels" . | nindent 4 }}
+
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "radius-server.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "radius-server.selectorLabels" . | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "radius-server.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: RADIUS_LISTEN_IP
+              value: "*"
+            - name: USERS_FILE
+              value: "/etc/raddb/users"
+            - name: RADIUS_CLIENTS
+              value: "SECRET@0.0.0.0/0,healthsecret@127.0.0.1/32"
+          ports:
+            - containerPort: 1812
+              name: radius-auth
+              protocol: UDP
+            - containerPort: 1813
+              name: radacc-acc
+              protocol: UDP
+            - containerPort: 18120
+              name: radius
+              protocol: TCP
+          # radtest user pass <IPAddress> 1812 SECRET
+          # livenessProbe:
+          readinessProbe:
+            exec:
+              command:
+              - radtest
+              - healthuser
+              - healthpass
+              - 127.0.0.1
+              - '1812'
+              - healthsecret
+            initialDelaySeconds: 15
+            periodSeconds: 60
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: radius-server-config
+              mountPath: /etc/raddb/clients.conf
+              subPath: clients.conf
+            - name: radius-server-config
+              mountPath: /etc/raddb/users
+              subPath: users
+      volumes:
+        - name: radius-server-config
+          configMap:
+            name: {{ include "radius-server.fullname" . }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
