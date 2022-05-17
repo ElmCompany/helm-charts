@@ -1,9 +1,9 @@
 apiVersion: "v1"
 kind: "Pod"
 metadata:
-  name: {{ include "docker-dind-sshd.fullname" . }}-test-connection
+  name: {{ include "docker-daemon-sshd.fullname" . }}-test-connection
   labels:
-    {{- include "docker-dind-sshd.labels" . | nindent 4 }}
+    {{- include "docker-daemon-sshd.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": test
 spec:
@@ -32,4 +32,4 @@ spec:
   volumes:
   - name: docker-ssh-files
     configMap:
-      name: {{ include "docker-dind-sshd.fullname" . }}-ssh-dir
+      name: {{ include "docker-daemon-sshd.fullname" . }}-ssh-dir

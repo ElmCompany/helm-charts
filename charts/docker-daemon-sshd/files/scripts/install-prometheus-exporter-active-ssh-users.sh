@@ -8,14 +8,7 @@ set -ex
 ## $1 offline or not exist
 ###   if "offline": script will use proxy.
 # cert CA
-if [ "$1" = "offline" ]; then 
-   export HTTP_PROXY=10.33.195.36:8082 HTTPS_PROXY=10.33.195.36:8082
-else
-   curl -O https://nexus.elm.sa/repository/packages/elm-cert.der && \
-      openssl x509 -inform der -in elm-cert.der -out /etc/pki/ca-trust/source/anchors/elm-cert.crt && \
-      cat /etc/pki/ca-trust/source/anchors/elm-cert.crt >> /etc/ssl/certs/ca-certificates.crt && \
-      update-ca-trust
-fi
+## TODO - Parametrize HTTP_PROXY if exist
 
 #    download exporter
 declare -r owner="stfsy"

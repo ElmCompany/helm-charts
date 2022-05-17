@@ -3,21 +3,21 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "docker-dind-sshd.fullname" . }}
+  name: {{ include "docker-daemon-sshd.fullname" . }}
   labels:
-    {{- include "docker-dind-sshd.labels" . | nindent 4 }}
+    {{- include "docker-daemon-sshd.labels" . | nindent 4 }}
 spec:
-  serviceName:  {{ include "docker-dind-sshd.fullname" . }}
+  serviceName:  {{ include "docker-daemon-sshd.fullname" . }}
   replicas: 1
   selector:
     matchLabels:
-      {{- include "docker-dind-sshd.selectorLabels" . | nindent 6 }}
+      {{- include "docker-daemon-sshd.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "docker-dind-sshd.selectorLabels" . | nindent 8 }}
+        {{- include "docker-daemon-sshd.selectorLabels" . | nindent 8 }}
     spec:
-      serviceAccountName: {{ include "docker-dind-sshd.serviceAccountName" . }}
+      serviceAccountName: {{ include "docker-daemon-sshd.serviceAccountName" . }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -76,7 +76,7 @@ spec:
             - name: AUTHORIZED_KEYS
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "docker-dind-sshd.fullname" . }}-ssh-dir
+                  name: {{ include "docker-daemon-sshd.fullname" . }}-ssh-dir
                   key: id_rsa.pub
                 # secretKeyRef:
                 #   name: docker-ssh-files
@@ -142,7 +142,7 @@ spec:
             type: "DirectoryOrCreate"
   {{- else }}
           persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (include "docker-dind-sshd.fullname" .) }}
+            claimName: {{ .Values.persistence.existingClaim | default (include "docker-daemon-sshd.fullname" .) }}
   {{- end }}
 {{- else }}
           emptyDir: {}
