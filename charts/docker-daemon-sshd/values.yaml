@@ -4,7 +4,7 @@
 
 dind:
   image:
-    repository: nexus.elm.sa/docker
+    repository: docker.io/docker
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: # 20.10-dind
@@ -54,7 +54,7 @@ monitoring:
 
 sshd:
   image:
-    repository: nexus.elm.sa/praqma/alpine-sshd
+    repository: docker.io/praqma/alpine-sshd
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: "latest"
@@ -91,7 +91,7 @@ sshd:
 
 dockerClient:
   image:
-    repository: nexus.elm.sa/docker
+    repository: docker.io/docker
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: # "20.10"
@@ -121,7 +121,9 @@ sshClient:
   useContext: false
   # instead of useContext, you can auto-select the first healthy daemon
   autoSelectContext: true
-  dockerLoginCmd: docker login nexus.elm.sa -u ci-user -p Aa123456
+  ## .Values.sshClient.dockerLoginCmd
+  # docker login my.private.registry.co -u USER -p PASS
+  dockerLoginCmd:
   ## .Values.sshClient.postStartCmd
   ## command to run at the end of script which runs at the lifecycle postStart of the client pod
   ## example:
@@ -140,7 +142,7 @@ sshClient:
   extraKnownHosts: []
   podExample:
     enabled: true
-    imageRepository: nexus.elm.sa/abdennour/docker-compose
+    imageRepository: docker.io/abdennour/docker-compose
     imageTag: 1.29.2-ssh
     ## .Values.imagePullSecrets
     ## example:
@@ -252,14 +254,13 @@ persistence:
   hostPath: # /opt/pods-{{ .Chart.Name }}-{{ .Release.Name }}
   ## exsting
   exsitingClaim:
-  ## for new PVC:
+  ## for new PVC: ( If hostPath is empty && existingClaim is empty )
   size: 100Gi
   accessMode: ReadWriteOnce # or ReadWriteOnce ReadWriteMany
   ## jenkins data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
   ## If undefined (the default) or set to null, no storageClassName spec is
-  ## in k8s devops.elm.sa, there are : nfs-client, nfs-sea
   ## in general check output of : kubectl get sc (of your cluster)
   storageClass:
 
@@ -274,7 +275,7 @@ cacheCleaner:
   until: 24h
   byImageLabel: # imagenature=builtbyci
   image:
-    repository: nexus.elm.sa/docker # nexus.elm.sa/abdennour/docker
+    repository: docker.io/docker # docker.io/abdennour/docker
     tag: # 20.10-buildx-0.6.3
   apiVersion: batch/v1beta1
 

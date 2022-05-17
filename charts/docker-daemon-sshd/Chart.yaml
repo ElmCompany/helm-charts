@@ -26,12 +26,6 @@ keywords:
 # pipeline. Library charts do not define any templates and therefore cannot be deployed.
 type: application
 
-# dependencies: # A list of the chart requirements (optional)
-#   - name: external-service
-#     version: 1.0.1
-#     repository: https://nexus.elm.sa/repository/charts
-#     alias: existingDockerDaemon
-#     condition: existingDockerDaemon.enabled
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
