@@ -1,0 +1,74 @@
+{{ $dockerHost := printf "%s.%s" (include "docker-dind-sshd.fullname" .) .Release.Namespace }}
+{{ $dockerEndpoint := printf "ssh://%s@%s" (include "docker-dind-sshd.sshUser" .) $dockerHost }}
+{{ $namespaces := append .Values.sshClient.namespaces .Release.Namespace }}
+{{ range $ns := $namespaces }}  
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ include "docker-dind-sshd.fullname" $ }}-ssh-dir
+  labels:
+    {{- include "docker-dind-sshd.labels" $ | nindent 4 }}
+  namespace: {{ $ns }}
+
+data:
+  id_rsa: {{ $.Values.sshKeys.private | quote }}
+  id_rsa.pub: {{ $.Values.sshKeys.public }}
+  auto-select-docker-context.sh: |
+    #!/bin/sh
+    function auto_select_remote_docker()
+    {
+      DOCKERTIMEOUT=$1
+      export SELECTED=nothing
+      docker context ls | while read -r ctx;do
+        name=$(echo $ctx | awk '{print $1}');
+        if [ "${name}" = "NAME" ] ||  [ "${name}" = "default" ]; then
+          continue;
+        fi
+        echo "Checking health of cloudnative build env ${name} ..."
+        DOCKER_CONTEXT=${name} timeout -s 9 $DOCKERTIMEOUT docker system info -f '{{`{{ .Name }}`}}';
+        if [ $? == "0" ];then
+          echo "Selecting ${name} ...."
+          export SELECTED=${name};
+          docker context use ${name};
+          break;
+        fi
+      done
+    }
+
+    auto_select_remote_docker 9
+  post-start.sh: |
+    mkdir -p -m 600 ~/.ssh;
+    cp -rL {{ $.Values.sshClient.mountPath }}/* ~/.ssh;
+    chmod 400 ~/.ssh/id_rsa;
+    docker context create {{ include "docker-dind-sshd.fullname" $ }} --docker "host={{ $dockerEndpoint }}";
+    {{- range $dockerContext := $.Values.dockerClient.extraDockerContextes }}
+    {{- if not (eq $dockerContext.endpoint $dockerEndpoint ) }}
+    docker context create {{ $dockerContext.name }} --docker "host={{ $dockerContext.endpoint }}";
+    {{- end }}
+    {{- end }}    
+    {{- if $.Values.sshClient.useContext }}
+    docker context use {{ include "docker-dind-sshd.fullname" $ }};
+    {{- end }}
+    {{- if $.Values.sshClient.autoSelectContext }}
+    sh /tmp/ssh-files/auto-select-docker-context.sh
+    {{- end }}
+    {{- if $.Values.sshClient.dockerLoginCmd }}
+    {{ $.Values.sshClient.dockerLoginCmd }}
+    {{- end }}
+    {{- if $.Values.sshClient.postStartCmd }}
+    {{ $.Values.sshClient.postStartCmd }}
+    {{- end }}
+
+  config: |
+    Host {{ $dockerHost }}
+      StrictHostKeyChecking no
+      UserKnownHostsFile=/dev/null
+    {{- range $host := $.Values.sshClient.extraKnownHosts }}
+    {{- if not (eq $host $dockerHost ) }}
+    Host {{ $host }}
+      StrictHostKeyChecking no
+      UserKnownHostsFile=/dev/null
+    {{- end }}
+    {{- end }}
+{{- end }}

@@ -1,0 +1,172 @@
+{{- if not .Values.existingDockerDaemon.enabled }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "docker-dind-sshd.fullname" . }}
+  labels:
+    {{- include "docker-dind-sshd.labels" . | nindent 4 }}
+spec:
+  serviceName:  {{ include "docker-dind-sshd.fullname" . }}
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "docker-dind-sshd.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "docker-dind-sshd.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "docker-dind-sshd.serviceAccountName" . }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+        - name: download-docker-cli
+          image: "{{ .Values.dockerClient.image.repository }}:{{ .Values.dockerClient.image.tag | default .Chart.AppVersion }}"
+          command:
+            - /bin/sh
+          args:
+            - -c
+            - mv /usr/local/bin/docker /shared-bin/ && chmod a+x /shared-bin/* && chown 1000:0 -R /shared-bin/
+          volumeMounts:
+            - mountPath: /shared-bin
+              name: bin
+          resources:
+            {{- toYaml .Values.dockerClient.resources | nindent 12 }}
+      containers:
+        - name: sshd
+          image: "{{ .Values.sshd.image.repository }}:{{ .Values.sshd.image.tag }}"
+          # command:
+          #   - /bin/sh
+          # args:
+          #   - -c
+          #   - >
+          #     printenv | grep _ >> /etc/environment &&
+          #     sed -e 's/^/export /' /etc/environment > /etc/profile.d/env.sh &&
+          #     chmod a+x /etc/profile.d/env.sh &&
+          #     /docker-entrypoint.sh /usr/sbin/sshd -D -e
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                - sh
+                - -c
+                - cp /shared-bin/docker /usr/bin/docker
+          startupProbe:
+            tcpSocket:
+              port: 22
+            failureThreshold: 10
+            periodSeconds: 3
+          livenessProbe:
+            tcpSocket:
+              port: 22
+            failureThreshold: 3
+            periodSeconds: 3
+          readinessProbe:
+            exec:
+              command:
+              - docker
+              - ps
+            failureThreshold: 3
+            periodSeconds: 5
+          env:
+            # it's id_rsa.pub content of ssh-keygen -t rsa
+            - name: AUTHORIZED_KEYS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "docker-dind-sshd.fullname" . }}-ssh-dir
+                  key: id_rsa.pub
+                # secretKeyRef:
+                #   name: docker-ssh-files
+                #   key: id_rsa.pub
+          ports:
+            - name: sshd
+              containerPort: 22
+              protocol: TCP
+          volumeMounts:
+            - name: bin
+              mountPath: /shared-bin
+            - name: var-run
+              mountPath: /var/run
+          resources:
+            {{- toYaml .Values.sshd.resources | nindent 12 }}
+        - name: dind
+          image: '{{ .Values.dind.image.repository }}:{{ .Values.dind.image.tag | default (printf "%s-dind" .Chart.AppVersion) }}'
+          args:
+          - "--insecure-registry"
+          - "nexus.nexus"
+          - "--storage-driver"
+          - "{{ .Values.dind.storageDriver }}"
+          resources:
+            {{- toYaml .Values.dind.resources | nindent 12 }}
+          securityContext:
+            privileged: true
+          tty: true
+          startupProbe:
+            tcpSocket:
+              port: 2376
+            failureThreshold: 10
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+              - docker
+              - ps
+            failureThreshold: 3
+            periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: 2376
+            failureThreshold: 3
+            periodSeconds: 5
+          volumeMounts:
+          - mountPath: "/var/lib/docker"
+            name: "docker-graph-storage"
+          - name: var-run
+            mountPath: /var/run
+          - mountPath: "/lib/modules"
+            name: "modules"
+            readOnly: true
+          - mountPath: "/sys/fs/cgroup"
+            name: "cgroup"
+      volumes:
+        - name: var-run
+          emptyDir: {}
+        - name: docker-graph-storage
+{{- if .Values.persistence.enabled }}
+  {{- if .Values.persistence.hostPath }}
+          hostPath:
+            path: {{ tpl .Values.persistence.hostPath . }}
+            type: "DirectoryOrCreate"
+  {{- else }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "docker-dind-sshd.fullname" .) }}
+  {{- end }}
+{{- else }}
+          emptyDir: {}
+{{- end }}
+        - name: bin
+          emptyDir: {}
+        - hostPath:
+            path: "/sys/fs/cgroup"
+            type: "Directory"
+          name: "cgroup"
+        - hostPath:
+            path: "/lib/modules"
+            type: "Directory"
+          name: "modules"
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

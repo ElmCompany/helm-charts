@@ -1,0 +1,285 @@
+# Default values for docker-dind-sshd.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+dind:
+  image:
+    repository: nexus.elm.sa/docker
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: # 20.10-dind
+  ## .Values.dind.resources
+  # resources:
+  #   limits:
+  #     cpu: "1500m"
+  #     memory: "4096Mi"
+  #   requests:
+  #     cpu: "750m"
+  resources: {}
+  ### .Values.dind.storageDriver
+  ## possible values: https://docs.docker.com/storage/storagedriver/select-storage-driver/
+  storageDriver: vfs # overlay2
+
+# .Values.existingDockerDaemon
+### it is about using external Docker Daemon, point to it,,.. instead of provisioing Dind
+existingDockerDaemon:
+  enabled: false
+  ip:
+  port: 22
+  sshUser:
+  sshMaxSessions: 100
+monitoring:
+  enabled: false
+  # "metrics-addr": "0.0.0.0:9999" in /etc/docker/*.json
+  port: 9999
+  serviceMonitor:
+    # -- Enable a prometheus ServiceMonitor
+    enabled: false
+    # -- Prometheus ServiceMonitor interval
+    interval: 30s
+    # -- Prometheus ServiceMonitor path
+    path: /metrics
+    # -- Prometheus [RelabelConfigs] to apply to samples before scraping
+    relabelings: []
+    # -- Prometheus [MetricRelabelConfigs] to apply to samples before ingestion
+    metricRelabelings: []
+    # -- Prometheus ServiceMonitor selector
+    selector: {}
+      # release: prometheus
+
+    # -- Prometheus ServiceMonitor namespace
+    namespace: "" # "monitoring"
+    # -- Prometheus ServiceMonitor labels
+    additionalLabels: {}
+
+sshd:
+  image:
+    repository: nexus.elm.sa/praqma/alpine-sshd
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "latest"
+  ## .Values.sshd.resources
+  resources:
+    limits:
+      cpu: '1000m'
+      memory: '256Mi'
+    requests:
+      memory: '64Mi'
+  # depends on https://github.com/stfsy/prometheus-what-active-users-exporter/
+  monitoring:
+    enabled: false
+    port: 9839
+    serviceMonitor:
+      # -- Enable a prometheus ServiceMonitor
+      enabled: false
+      # -- Prometheus ServiceMonitor interval
+      interval: 30s
+      # -- Prometheus ServiceMonitor path
+      path: /metrics
+      # -- Prometheus [RelabelConfigs] to apply to samples before scraping
+      relabelings: []
+      # -- Prometheus [MetricRelabelConfigs] to apply to samples before ingestion
+      metricRelabelings: []
+      # -- Prometheus ServiceMonitor selector
+      selector: {}
+        # release: prometheus
+
+      # -- Prometheus ServiceMonitor namespace
+      namespace: "" # "monitoring"
+      # -- Prometheus ServiceMonitor labels
+      additionalLabels: {}
+
+dockerClient:
+  image:
+    repository: nexus.elm.sa/docker
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: # "20.10"
+  ## .Values.dockerClient.resources
+  resources:
+    limits:
+      cpu: '100m'
+      memory: '64Mi'
+  ### .Values.dockerClient.extraDockerContextes
+  ## .i.e
+  # extraDockerContextes:
+  #   - name: pe1-cdx-rv-gs05
+  #     endpoint: ssh://docker@pe1-cdx-rv-gs05.docker
+  #   - name: ci
+  #     endpoint: ssh://ci@192.168.71.43
+  #   - name: spare
+  #     endpoint: tcp://172.55.81.32:2375
+  extraDockerContextes: []
+## .Values.imagePullSecrets
+## example:
+# imagePullSecrets:
+#   - name: nexus
+imagePullSecrets: []
+sshClient:
+  mountPath: /tmp/ssh-files
+  # execute automatically "docker context use ..." . yes/no
+  useContext: false
+  # instead of useContext, you can auto-select the first healthy daemon
+  autoSelectContext: true
+  dockerLoginCmd: docker login nexus.elm.sa -u ci-user -p Aa123456
+  ## .Values.sshClient.postStartCmd
+  ## command to run at the end of script which runs at the lifecycle postStart of the client pod
+  ## example:
+  # postStartCmd: docker login nexus.nexus -u ci-user -p Aa123456
+  # postStartCmd: http_proxy=proxy.nexus:8082 apk add --update openssh-client
+  postStartCmd:
+  ### .Values.sshClient.namespaces
+  ## namespaces that require to have the ssh assets (keys, config,...)
+  namespaces: []
+  ### .Values.sshClient.extraKnownHosts
+  ## i.e.
+  # extraKnownHosts:
+  #   - 10.33.44.39
+  #   - vm-abdennour.guacamole
+  #   - pe1-cdx-rv-gs05.docker
+  extraKnownHosts: []
+  podExample:
+    enabled: true
+    imageRepository: nexus.elm.sa/abdennour/docker-compose
+    imageTag: 1.29.2-ssh
+    ## .Values.imagePullSecrets
+    ## example:
+    # imagePullSecrets:
+    #   - name: nexus
+    imagePullSecrets: []
+    resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+sshKeys:
+  public: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDHcAwSxJK+3P+4+Fa7dXsWK1G8h3gg1hqGSgykuPVqxyw5irEhHpKigVU02pDbQv7j7ExB2sPLQxZerZmhPUeLoJfNmMM28jNQ4vNn/CmtbmdvXLui9jt0n9R+YU4YhGDxHzseSYngRs+MTHZlpajVL3BIBy5+ZZBzktqRYUmTWMQnE1xqZlMgLhPy7DuOfnxw2tPa6zkyAGWV8Ec4H9axoATkoxl65Yggo2lvanxoOdG5/Vwzy7P4z3YGd13UPwEo/mY9nhYQ7yzVVjcUOmpZjIg511Ea4JHs5MtgW3x6FMFf47aXrOu0xm3zztRQR0xdiC5j4w1Ri2+8q+bZIe7l fd@N11336
+  private: |
+    -----BEGIN RSA PRIVATE KEY-----
+    MIIEpQIBAAKCAQEAx3AMEsSSvtz/uPhWu3V7FitRvId4INYahkoMpLj1ascsOYqx
+    IR6SooFVNNqQ20L+4+xMQdrDy0MWXq2ZoT1Hi6CXzZjDNvIzUOLzZ/wprW5nb1y7
+    ovY7dJ/UfmFOGIRg8R87HkmJ4EbPjEx2ZaWo1S9wSAcufmWQc5LakWFJk1jEJxNc
+    amZTIC4T8uw7jn58cNrT2us5MgBllfBHOB/WsaAE5KMZeuWIIKNpb2p8aDnRuf1c
+    M8uz+M92Bndd1D8BKP5mPZ4WEO8s1VY3FDpqWYyIOddRGuCR7OTLYFt8ehTBX+O2
+    l6zrtMZt887UUEdMXYguY+MNUYtvvKvm2SHu5QIDAQABAoIBAQCAD6CRBIw95maF
+    /WCj6mHo8FQBvPMUEqbhh/bqZqGfuNja8gWfAKSjmGyADcBqKnDFJdwphTGn+SIK
+    FWrKsDCapboUGH1xcMAmtjQZlz+jz3q3dVI+5+Fxl5e4tv6Qm6Ar9CPf5NSVoKJw
+    skBsMJ1ilp2AgqwGGW1R6QBTzaaS547GS0yIynuvnXtMQJODSFh082+b0lrhjjNS
+    lmL4yCiVHRmFsTnFKcd4gbpQsGyMyGFkZ48SLfIlLmIw6lTv1oO7WY5DQ8KcRA/0
+    d+xlwWQXFpO00I1DB3p4ZSm33bGjoOcx2cCB8Xlq2dXwy/QIwXf/AEoLyIOuyS8f
+    lLRjF8BZAoGBAPxo5owUVvE1XVHdQY04MoM8Sog2SzcyPEqNQdh+bJW2xL0fhKYr
+    1vmcBj68VVBHjUucYNfoXY27GP/iWm261LAfvHZPg57Yiz8+SSH9rRPHtiyGGA1k
+    zLQpg+s4J90mQVQRQrPFxObU30XQkHAf7+uryuEn9kwnDqM8s8hmHl+DAoGBAMpG
+    Qmeav0k6+ZJqwvR9xDgAhvjtEN/MiZ1lQn32k1tG0LpZ8y0547a9TbaNsJtcUlrx
+    gFFH+xxthlVw8VVQLllxtpT6lhev4ClAnpQ1POSKTVTt0Tv5ywbyxSDzY7VRHAI2
+    CMRCsSOLgcdiUQ/uEnwzTRgEMqS5dBBM5PTgdwN3AoGBAIcyLOK09kime8CgkT7x
+    7eRrQ8SnyCvdZXvNI4qxVLnwNnrSSfuzmacDEjlCKTQhzyXDsf+Tf6CtqVtNw3/o
+    xYk8xnZcarSHajZKx2NEfBMPMp2wiWuLJTYO0pEH+Bo1JmLACAlAkhHNzXWYm/Ti
+    tmB2GOn2vK7XcLiwh998CyK/AoGAUscV/dgyWAGuiODwD6Y4WsK8ebpqoWvPFX6P
+    C4WRIFWGrfyJrAR40BwAZajukWXivhz+6kSO2z9nLigeW0+I6EnE8orqSZ9MGRW8
+    z+JJnS2MICmC6wx6rclEKwvvzg/3amA6jjbMz0MURUhS7DX9kp5b+mwdXZQXj2Qo
+    fp4tllkCgYEA8sbqc+c5EXQ8SIYq5TMKo/5sBQIXqMPM2NPfIaMCmQeFAh4K2MJC
+    3H06VwaiK/NNPJDqcIpQ+Yuin9/Mrfku5FQ4jXTYYuvXzSG+FTs6Tux5RVCcDBIj
+    DCCmKxQdgOOjZvCuU/Y1pFbByozFZYPv9XWq8zSZnTmjcamqM8n3vcs=
+    -----END RSA PRIVATE KEY-----
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+## persistence for the docker storage
+persistence:
+  enabled: true
+  ## for hostPath VOl
+  hostPath: # /opt/pods-{{ .Chart.Name }}-{{ .Release.Name }}
+  ## exsting
+  exsitingClaim:
+  ## for new PVC:
+  size: 100Gi
+  accessMode: ReadWriteOnce # or ReadWriteOnce ReadWriteMany
+  ## jenkins data Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ## in k8s devops.elm.sa, there are : nfs-client, nfs-sea
+  ## in general check output of : kubectl get sc (of your cluster)
+  storageClass:
+
+cacheCleaner:
+  enabled: false
+  ## .Values.cacheCleaner.schedule
+  ##    job will be run periodically as per this value
+  schedule: '0 1 * * *'
+  ## .Values.cacheCleaner.until
+  ##    only clean docker objects before this value. 
+  ## and keep objects after that value
+  until: 24h
+  byImageLabel: # imagenature=builtbyci
+  image:
+    repository: nexus.elm.sa/docker # nexus.elm.sa/abdennour/docker
+    tag: # 20.10-buildx-0.6.3
+  apiVersion: batch/v1beta1
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
