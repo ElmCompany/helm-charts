@@ -5,9 +5,9 @@
 apiVersion: "v1"
 kind: "Pod"
 metadata:
-  name: {{ include "docker-dind-sshd.fullname" $ }}-client-example
+  name: {{ include "docker-daemon-sshd.fullname" $ }}-client-example
   labels:
-    {{- include "docker-dind-sshd.labels" $ | nindent 4 }}
+    {{- include "docker-daemon-sshd.labels" $ | nindent 4 }}
   namespace: {{ $ns }}
 spec:
   restartPolicy: Never
@@ -35,6 +35,6 @@ spec:
   volumes:
   - name: docker-ssh-files
     configMap:
-      name: {{ include "docker-dind-sshd.fullname" $ }}-ssh-dir
+      name: {{ include "docker-daemon-sshd.fullname" $ }}-ssh-dir
 {{- end }}
 {{- end }}

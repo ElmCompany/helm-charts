@@ -2,7 +2,7 @@ Connect to the docker daemon using this command:
 ----
 
 ```
-docker context create remote --docker "host=ssh://{{ include "docker-dind-sshd.sshUser" $ }}@{{ include "docker-dind-sshd.fullname" $ }}.{{ .Release.Namespace }}";
+docker context create remote --docker "host=ssh://{{ include "docker-daemon-sshd.sshUser" $ }}@{{ include "docker-daemon-sshd.fullname" $ }}.{{ .Release.Namespace }}";
 ```
 
 EXAMPLES: 
@@ -14,7 +14,7 @@ In order to see examples below, make sure to :
 {{- if .Values.sshClient.podExample.enabled }}
 Try to connect to docker clients :
 {{ range $ns := .Values.sshClient.namespaces }}  
-kubectl -n {{ $ns }} exec -it {{ include "docker-dind-sshd.fullname" $ }}-client-example -c docker-client -- docker ps
+kubectl -n {{ $ns }} exec -it {{ include "docker-daemon-sshd.fullname" $ }}-client-example -c docker-client -- docker ps
 {{- end }}
 {{- end }}
 
@@ -27,13 +27,13 @@ For any other Pod 'x' in namespace 'y' wants to use this daemon, make sure to do
 2. the pod/container 'x' has at least 2 executables : `ssh` client (openssh-client) +  docker client (docker )
   i.e. : {{ .Values.sshClient.podExample.imageRepository }}:{{ .Values.sshClient.podExample.imageTag }}
 
-3. the pod 'x' define an extra volume from the configMap {{ include "docker-dind-sshd.fullname" $ }}-ssh-dir
+3. the pod 'x' define an extra volume from the configMap {{ include "docker-daemon-sshd.fullname" $ }}-ssh-dir
 
 ```
   volumes:
   - name: docker-ssh-files
     configMap:
-      name: {{ include "docker-dind-sshd.fullname" $ }}-ssh-dir
+      name: {{ include "docker-daemon-sshd.fullname" $ }}-ssh-dir
 ```
 4. the pod/container 'x' mounts the volume as following: 
 
@@ -58,7 +58,7 @@ For any other Pod 'x' in namespace 'y' wants to use this daemon, make sure to do
 # Prepare Machine {{ .Values.existingDockerDaemon.ip }} where existing daemon running ##
 ########
 
-kubectl -n {{ .Release.Namespace}} get configmap {{ include "docker-dind-sshd.fullname" . }}-helper-scripts \
+kubectl -n {{ .Release.Namespace}} get configmap {{ include "docker-daemon-sshd.fullname" . }}-helper-scripts \
   -o jsonpath='{.data.prepare-existing-daemon\.sh}' > prepare-existing-daemon.sh
 scp prepare-existing-daemon.sh {{ .Values.existingDockerDaemon.ip }}:/tmp/
 ssh {{ .Values.existingDockerDaemon.ip }}
@@ -67,7 +67,7 @@ ssh {{ .Values.existingDockerDaemon.ip }}
 {{- end }}
 
 {{- if .Values.sshd.monitoring.enabled }}
-kubectl -n {{ .Release.Namespace}} get configmap {{ include "docker-dind-sshd.fullname" . }}-helper-scripts \
+kubectl -n {{ .Release.Namespace}} get configmap {{ include "docker-daemon-sshd.fullname" . }}-helper-scripts \
   -o jsonpath='{.data.install-prometheus-exporter-active-ssh-users\.sh}' > install-prometheus-exporter-active-ssh-users.sh
 scp install-prometheus-exporter-active-ssh-users.sh {{ .Values.existingDockerDaemon.ip }}:/tmp/
 ssh {{ .Values.existingDockerDaemon.ip }}

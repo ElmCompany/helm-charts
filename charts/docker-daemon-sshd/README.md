@@ -7,11 +7,11 @@ Useful for accessing remote docker daemon thru ssh : `docker context create remo
 # Values
 
 Check default Values of this chart [here]( 
-https://bitbucket.elm.sa/projects/SCL/repos/helm-chart-docker-dind-sshd/browse/docker-dind-sshd/values.yaml)
+https://bitbucket.elm.sa/projects/SCL/repos/helm-chart-docker-daemon-sshd/browse/docker-daemon-sshd/values.yaml)
 
 # How to install the app 
 
-Check instructions at right sidebar in [DevOps Appstore](https://appstore.devops.elm.sa/charts/elm/docker-dind-sshd)
+Check instructions at right sidebar in [DevOps Appstore](https://appstore.devops.elm.sa/charts/elm/docker-daemon-sshd)
 
 
 # Authors
