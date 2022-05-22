@@ -1,0 +1,32 @@
+{{- if .Values.autoscaling.enabled }}
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "generic-app.fullname" . }}
+  labels:
+    {{- include "generic-app.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    {{- if eq .Values.deployment.kind "DeploymentConfig" }}
+    apiVersion: apps.openshift.io/v1
+    {{- else }}
+    apiVersion: apps/v1
+    {{- end }}
+    kind: {{ .Values.deployment.kind }}
+    name: {{ include "generic-app.fullname" . }}
+  minReplicas: {{ .Values.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  metrics:
+  {{- if .Values.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
+  {{- end }}
+  {{- if .Values.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: {{ .Values.autoscaling.targetMemoryUtilizationPercentage }}
+  {{- end }}
+{{- end }}

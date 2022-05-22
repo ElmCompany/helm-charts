@@ -1,0 +1,36 @@
+{{- if and .Values.openshift .Values.route.enabled -}}
+{{- range $index,$host := ( splitList "@" (include "generic-app.hosts" . )) }}
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  {{- if eq $index 0 }}
+  name: {{ include "generic-app.fullname" $ }}
+  {{- else }}
+  name: {{ include "generic-app.fullname" $ }}-extra{{ $index }}
+  {{- end }}
+  {{- with $.Values.route.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "generic-app.labels" $ | nindent 4 }}
+spec:
+  host: {{ $host }}
+  {{- if and (eq $index 0) $.Values.route.secure }}
+  tls:
+    termination: {{ $.Values.route.termination }}
+  {{- end }}
+  {{- if and (not (eq $index 0)) ($.Values.route.secureExtraHosts) }}
+  tls:
+    termination: {{ $.Values.route.termination }}
+  {{- end }}
+  port:
+    targetPort: tcp-{{ $.Values.port }}
+  to:
+    kind: Service
+    name: {{ include "generic-app.fullname" $ }}
+    weight: 100
+  wildcardPolicy: None
+{{- end }}
+{{- end }}

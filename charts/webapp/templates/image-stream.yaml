@@ -1,0 +1,17 @@
+{{- if eq .Values.deployment.kind "DeploymentConfig" }}
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: {{ include "generic-app.fullname" . }}
+  labels:
+    {{- include "generic-app.labels" . | nindent 4 }}
+spec:
+  dockerImageRepository: {{ include "generic-app.imageRepo" . }}
+  tags:
+    - name: {{ .Values.image.tag | quote }}
+      from:
+        kind: DockerImage
+        name: '{{ include "generic-app.imageRepo" . }}:{{ .Values.image.tag }}'
+  lookupPolicy:
+    local: false
+{{- end }}

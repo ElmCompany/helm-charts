@@ -1,0 +1,11 @@
+{{- if .Values.configFile.name -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "generic-app.fullname" . }}-file
+  labels:
+    {{- include "generic-app.labels" . | nindent 4 }}
+data:
+  {{ .Values.configFile.name }}: |
+    {{ .Values.configFile.content | nindent 4 }}
+{{- end }}

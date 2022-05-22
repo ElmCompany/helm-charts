@@ -1,0 +1,173 @@
+{{ if .Values.deployment.enabled }}
+{{- if eq .Values.deployment.kind "DeploymentConfig" }}
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: {{ include "generic-app.fullname" . }}
+  labels:
+    {{- include "generic-app.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: {{ .Values.deployment.revisionHistoryLimit }}
+  triggers:
+  - type: ConfigChange
+  - imageChangeParams:
+      automatic: {{ .Values.deployment.triggers.imageStreamChange }}
+      containerNames:
+      - {{ include "generic-app.fullname" . }}
+      from:
+        kind: ImageStreamTag
+        name: {{ printf "%s:%s" (include "generic-app.fullname" .) .Values.image.tag }}
+    type: ImageChange
+  selector:
+    {{- include "generic-app.labels" . | nindent 4 }}
+    deploymentconfig: {{ include "generic-app.fullname" . }}
+  revisionHistoryLimit: 10
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources:
+      {{- toYaml .Values.rollout.resources | nindent 6 }}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      labels:
+        {{- include "generic-app.labels" . | nindent 8 }}
+        deploymentconfig: {{ include "generic-app.fullname" . }}
+      annotations:
+      {{- if .Values.envVars }}
+        checksum/configenvvars: {{ include (print $.Template.BasePath "/secret-env-vars.yaml") . | sha256sum }}
+      {{- end }}
+      {{- if .Values.envVarsSealed }}
+        checksum/configenvvarssealed: {{ include (print $.Template.BasePath "/secret-env-vars-sealed.yaml") . | sha256sum }}
+      {{- end }}
+      {{- if .Values.configFile.name }}
+        checksum/configfile: {{ include (print $.Template.BasePath "/configmap-file.yaml") . | sha256sum }}
+      {{- end }}
+    spec:
+    {{- if .Values.serviceAccount.create }}
+      serviceAccount: {{ include "generic-app.serviceAccountName" . }}
+      serviceAccountName: {{ include "generic-app.serviceAccountName" . }}
+    {{- end }}
+    {{- if .Values.image.pullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.image.pullSecret }}
+    {{- end }}
+{{- if .Values.initContainers }}
+      initContainers:
+{{ tpl (toYaml .Values.initContainers) . | indent 8 }}
+{{- end }}
+      containers:
+      - name: {{ include "generic-app.fullname" . }}
+        imagePullPolicy: Always
+        {{- if .Values.command }}
+        command:
+          {{- toYaml .Values.command | nindent 10 }}
+        {{- end }}
+        {{- if .Values.args }}
+        args:
+          {{- toYaml .Values.args | nindent 10 }}
+        {{- end }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.port }}
+          protocol: TCP
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        {{- with .Values.livenessProbe }}
+        livenessProbe:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.readinessProbe }}
+        readinessProbe:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      {{- if .Values.deployment.mountEnvVars }}
+        {{- if or .Values.envVars .Values.envVarsSealed }}
+        envFrom:
+        {{- end }}
+        {{- with .Values.envVars }}
+          - secretRef:
+              name: {{ include "generic-app.fullname" $ }}-env-vars
+        {{- end }}
+        {{- with .Values.envVarsSealed }}
+          - secretRef:
+              name: {{ include "generic-app.fullname" $ }}-env-vars-sealed
+        {{- end }}
+      {{- end }}
+        {{- if .Values.runAsUser }}
+        securityContext:
+          runAsUser: {{ .Values.runAsUser }}
+        {{- end }}
+        volumeMounts:
+{{- if .Values.volumeMounts }}
+{{ tpl (toYaml .Values.volumeMounts | indent 10) . }}
+{{- end }}
+        {{- if .Values.configFile.mount }}
+          - mountPath: {{ .Values.configFile.mount }}
+            name: config-file
+            readOnly: true
+        {{- end }}
+        {{- if .Values.persistence.enabled }}
+          - name: pvc-1
+            mountPath: {{ .Values.persistence.mount }}
+        {{- end }}
+        {{- if .Values.extraPersistence.enabled }}
+          - name: pvc-2
+            mountPath: {{ .Values.extraPersistence.mount }}
+            readOnly: {{ .Values.extraPersistence.readOnly }}
+        {{- end }}
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+{{- if .Values.volumes }}
+{{ tpl (toYaml .Values.volumes | indent 8) . }}
+{{- end }}
+      {{- if .Values.configFile.mount }}
+        - name: config-file
+          configMap:
+            defaultMode: 420
+            name: {{ include "generic-app.fullname" . }}-file
+            # items:
+            #   - key: {{ .Values.configFile.name }}
+            #     path: {{ .Values.configFile.name }}
+      {{- end }}
+      {{- if .Values.persistence.enabled }}
+        - name: pvc-1
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "generic-app.fullname" .) }}
+      {{- end }}
+      {{- if .Values.extraPersistence.enabled }}
+        - name: pvc-2
+          persistentVolumeClaim:
+            claimName: {{ include "generic-app.fullname" . }}-extra
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  test: false
+{{- end }}
+{{- end }}

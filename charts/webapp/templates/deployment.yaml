@@ -1,0 +1,135 @@
+{{ if .Values.deployment.enabled }}
+{{- if eq .Values.deployment.kind "Deployment" }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "generic-app.fullname" . }}
+  labels:
+    {{- include "generic-app.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "generic-app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+      {{- if .Values.envVars }}
+        checksum/configenvvars: {{ include (print $.Template.BasePath "/secret-env-vars.yaml") . | sha256sum }}
+      {{- end }}
+      {{- if .Values.envVarsSealed }}
+        checksum/configenvvarssealed: {{ include (print $.Template.BasePath "/secret-env-vars-sealed.yaml") . | sha256sum }}
+      {{- end }}
+      {{- if .Values.configFile.name }}
+        checksum/configfile: {{ include (print $.Template.BasePath "/configmap-file.yaml") . | sha256sum }}
+      {{- end }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "generic-app.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- if .Values.image.pullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.image.pullSecret }}
+      {{- end }}
+      {{- if .Values.serviceAccount.create }}
+      serviceAccount: {{ include "generic-app.serviceAccountName" . }}
+      serviceAccountName: {{ include "generic-app.serviceAccountName" . }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+{{- if .Values.initContainers }}
+      initContainers:
+{{ tpl (toYaml .Values.initContainers) . | indent 8 }}
+{{- end }}
+      containers:
+        - name: {{ include "generic-app.fullname" . }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ include "generic-app.imageRepo" . }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.port }}
+              protocol: TCP
+        {{- if .Values.deployment.mountEnvVars }}
+          {{- if or .Values.envVars .Values.envVarsSealed }}
+          envFrom:
+          {{- end }}
+          {{- with .Values.envVars }}
+            - secretRef:
+                name: {{ include "generic-app.fullname" $ }}-env-vars
+          {{- end }}
+          {{- with .Values.envVarsSealed }}
+            - secretRef:
+                name: {{ include "generic-app.fullname" $ }}-env-vars-sealed
+          {{- end }}
+        {{- end }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+          volumeMounts:
+  {{- if .Values.volumeMounts }}
+  {{ tpl (toYaml .Values.volumeMounts | indent 10) . }}
+  {{- end }}
+          {{- if .Values.configFile.mount }}
+            - mountPath: {{ .Values.configFile.mount }}
+              name: config-file
+              readOnly: true
+          {{- end }}
+          {{- if .Values.persistence.enabled }}
+            - name: pvc-1
+              mountPath: {{ .Values.persistence.mount }}
+          {{- end }}
+          {{- if .Values.extraPersistence.enabled }}
+            - name: pvc-2
+              mountPath: {{ .Values.extraPersistence.mount }}
+              readOnly: {{ .Values.extraPersistence.readOnly }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+{{- if .Values.volumes }}
+{{ tpl (toYaml .Values.volumes | indent 8) . }}
+{{- end }}
+      {{- if .Values.configFile.mount }}
+        - name: config-file
+          configMap:
+            defaultMode: 420
+            name: {{ include "generic-app.fullname" . }}-file
+            # items:
+            #   - key: {{ .Values.configFile.name }}
+            #     path: {{ .Values.configFile.name }}
+      {{- end }}
+      {{- if .Values.persistence.enabled }}
+        - name: pvc-1
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "generic-app.fullname" .) }}
+      {{- end }}
+      {{- if .Values.extraPersistence.enabled }}
+        - name: pvc-2
+          persistentVolumeClaim:
+            claimName: {{ include "generic-app.fullname" . }}-extra
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
+{{- end }}
