@@ -13,7 +13,15 @@ https://github.com/ElmCompany/helm-charts/blob/master/charts/docker-daemon-sshd/
 
 # How to install the app 
 
-TODO. In the meantime, Check the output of `helm status` after installing the chart.
+**Set Elm Repo**
+```sh
+helm repo add elm https://raw.githubusercontent.com/ElmCompany/helm-charts/gh-pages
+helm repo update
+```
+
+**Use it** `helm install elm/docker-daemon-sshd`
+
+**Post install** Check the output of `helm status` after installing the chart.
 
 # Authors
 
