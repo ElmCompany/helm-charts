@@ -1,0 +1,79 @@
+---
+## These files should be mounted to /etc/nginx/conf.d
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "single-page-app.fullname" . }}-nginx
+  labels:
+    {{- include "single-page-app.labels" . | nindent 4 }}
+data:
+  default.conf: |
+    server {
+      listen       {{ .Values.port }};
+      server_name  localhost;
+
+      #charset koi8-r;
+      #access_log  /var/log/nginx/host.access.log  main;
+
+      location / {
+          root   /usr/share/nginx/html;
+          index  index.html index.htm;
+          {{- if .Values.spa }}
+          try_files $uri $uri/ /index.html;
+          {{- end }}
+
+      }
+
+      #error_page  404              /404.html;
+
+      # redirect server error pages to the static page /50x.html
+      #
+      error_page   500 502 503 504  /50x.html;
+      location = /50x.html {
+          root   /usr/share/nginx/html;
+      }
+
+      # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+      #
+      #location ~ \.php$ {
+      #    root           html;
+      #    fastcgi_pass   127.0.0.1:9000;
+      #    fastcgi_index  index.php;
+      #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+      #    include        fastcgi_params;
+      #}   
+          
+      # deny access to .htaccess files, if Apache's document root
+      # concurs with nginx's one
+      #    
+      #location ~ /\.ht {
+      #    deny  all;
+      #}   
+    }
+  {{- if .Values.webOptimize.gzip }}
+  gzip.conf: |
+    gzip on;
+    gzip_http_version  1.0;
+    gzip_comp_level    5; # 1-9
+    gzip_min_length    256;
+    gzip_proxied       any;
+    gzip_vary          on;
+
+    # MIME-types
+    gzip_types
+      application/atom+xml
+      application/javascript
+      application/json
+      application/rss+xml
+      application/vnd.ms-fontobject
+      application/x-font-ttf
+      application/x-web-app-manifest+json
+      application/xhtml+xml
+      application/xml
+      font/opentype
+      image/svg+xml
+      image/x-icon
+      text/css
+      text/plain
+      text/x-component;
+  {{- end }}

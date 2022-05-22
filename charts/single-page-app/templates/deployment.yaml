@@ -1,0 +1,113 @@
+{{- if eq .Values.deployment.kind "Deployment" }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "single-page-app.fullname" . }}
+  labels:
+    {{- include "single-page-app.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "single-page-app.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/configenvvars: {{ include (print $.Template.BasePath "/secret-env-vars.yaml") . | sha256sum }}
+        checksum/confignginx: {{ include (print $.Template.BasePath "/configmap-nginx.yaml") . | sha256sum }}
+        checksum/configscripts: {{ include (print $.Template.BasePath "/configmap-scripts.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "single-page-app.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- if .Values.image.repository }}
+      imagePullSecrets:
+        - name: {{ .Values.image.pullSecret }}
+    {{- end }}
+    {{- if .Values.envVars }}
+      initContainers:
+      - name: env-generator
+        image: '{{ include "single-page-app.imageRepo" . }}:{{ .Values.image.tag }}'
+        command:
+          - sh
+          - /tmp/scripts/envars-to-js-object
+        args:
+          - --dest=/tmp/data
+          {{- if .Values.jsEnvFileGenerator.filename }}
+          - --dest-filename={{ .Values.jsEnvFileGenerator.filename }}
+          {{- end }}
+          - --env-vars-filter={{ .Values.jsEnvFileGenerator.envVarsPrefix }}
+          {{- if .Values.jsEnvFileGenerator.jsObjectPrefix }}
+          - --js-object={{ .Values.jsEnvFileGenerator.jsObjectPrefix }}
+          {{- end }}
+          - --run-as=job
+        volumeMounts:
+          - name: data-env
+            mountPath: /tmp/data
+          - name: config-scripts
+            mountPath: /tmp/scripts
+            readOnly: true
+        envFrom:
+          - secretRef:
+              name: {{ include "single-page-app.fullname" $ }}-env-vars
+      {{- end }}
+      containers:
+      - name: {{ include "single-page-app.fullname" . }}
+        imagePullPolicy: Always
+        image: "{{ include "single-page-app.imageRepo" . }}:{{ .Values.image.tag }}"
+        ports:
+        - name: http
+          containerPort: {{ .Values.port }}
+          protocol: TCP
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        {{- with .Values.livenessProbe }}
+        livenessProbe:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.readinessProbe }}
+        readinessProbe:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        volumeMounts:
+          - name: data-env
+            mountPath: {{ .Values.jsEnvFileGenerator.mount }}
+          - name: config-nginx
+            mountPath: /etc/nginx/conf.d
+            readOnly: true
+          - name: config-scripts
+            mountPath: /tmp/scripts
+            readOnly: true
+      volumes:
+        - name: data-env
+          emptyDir: {}
+        - name: config-nginx
+          configMap:
+            defaultMode: 420
+            name: {{ include "single-page-app.fullname" . }}-nginx
+      {{- if .Values.envVars }}
+        - name: config-scripts
+          configMap:
+            defaultMode: 420
+            name: {{ include "single-page-app.fullname" . }}-scripts
+            # items:
+            #   - key: 
+            #     path:
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
