@@ -2,16 +2,16 @@
 apiVersion: image.openshift.io/v1
 kind: ImageStream
 metadata:
-  name: {{ include "generic-app.fullname" . }}
+  name: {{ include "webapp.fullname" . }}
   labels:
-    {{- include "generic-app.labels" . | nindent 4 }}
+    {{- include "webapp.labels" . | nindent 4 }}
 spec:
-  dockerImageRepository: {{ include "generic-app.imageRepo" . }}
+  dockerImageRepository: {{ include "webapp.imageRepo" . }}
   tags:
-    - name: {{ .Values.image.tag | quote }}
+    - name: {{ (include "webapp.imageTag" .) | quote }}
       from:
         kind: DockerImage
-        name: '{{ include "generic-app.imageRepo" . }}:{{ .Values.image.tag }}'
+        name: '{{ include "webapp.imageRepo" . }}:{{ include "webapp.imageTag" . }}'
   lookupPolicy:
     local: false
 {{- end }}

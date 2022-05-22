@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "generic-app.fullname" . }}
+  name: {{ include "webapp.fullname" . }}
   labels:
-    {{- include "generic-app.labels" . | nindent 4 }}
+    {{- include "webapp.labels" . | nindent 4 }}
 spec:
   ports:
   - name: tcp-{{ .Values.port }}
@@ -11,9 +11,9 @@ spec:
     protocol: TCP
     targetPort: {{ .Values.port }}
   selector:
-    {{- include "generic-app.selectorLabels" . | nindent 4 }}
+    {{- include "webapp.selectorLabels" . | nindent 4 }}
     {{- if eq .Values.deployment.kind "DeploymentConfig" }}
-    deploymentconfig: {{ include "generic-app.fullname" . }}
+    deploymentconfig: {{ include "webapp.fullname" . }}
     {{- end }}
   sessionAffinity: None
   type: ClusterIP

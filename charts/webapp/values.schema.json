@@ -61,17 +61,6 @@
         "nameOverride": {
             "type": "string"
         },
-        "nexus": {
-            "type": "object",
-            "properties": {
-                "fullnameOverride": {
-                    "type": "string"
-                },
-                "host": {
-                    "type": "string"
-                }
-            }
-        },
         "nodeSelector": {
             "type": "object"
         },

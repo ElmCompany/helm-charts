@@ -2,7 +2,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "generic-app.name" -}}
+{{- define "webapp.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -11,7 +11,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "generic-app.fullname" -}}
+{{- define "webapp.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -27,16 +27,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "generic-app.chart" -}}
+{{- define "webapp.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "generic-app.labels" -}}
-helm.sh/chart: {{ include "generic-app.chart" . }}
-{{ include "generic-app.selectorLabels" . }}
+{{- define "webapp.labels" -}}
+helm.sh/chart: {{ include "webapp.chart" . }}
+{{ include "webapp.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -46,17 +46,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "generic-app.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "generic-app.name" . }}
+{{- define "webapp.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "webapp.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "generic-app.serviceAccountName" -}}
+{{- define "webapp.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "generic-app.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "webapp.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
@@ -67,14 +67,14 @@ Create the name of the service account to use
       # {{- if .Values.existingImageStream.name }}
       #   name: {{ .Values.existingImageStream.name }}:latest
       # {{- else }}
-      #   name: {{ include "generic-app.fullname" . }}:latest
+      #   name: {{ include "webapp.fullname" . }}:latest
       # {{- end }}
 
 
 {{/*
 image repo
 */}}
-{{- define "generic-app.imageRepo" -}}
+{{- define "webapp.imageRepo" -}}
 {{- if .Values.image.repository }}
 {{- .Values.image.repository }}
 {{- else }}
@@ -82,10 +82,26 @@ image repo
 {{- end }}
 {{- end }}
 
+{{- define "webapp.imageTag" -}}
+{{- if .Values.image.tag }}
+{{- .Values.image.tag }}
+{{- else }}
+{{- .Chart.AppVersion }}
+{{- end }}
+{{- end }}
+
+{{- define "webapp.cronjobImageTag" -}}
+{{- if .Values.cronjob.image.tag }}
+{{- .Values.cronjob.image.tag }}
+{{- else }}
+{{- .Chart.AppVersion }}
+{{- end }}
+{{- end }}
+
 {{/*
 host name
 */}}
-{{- define "generic-app.host" -}}
+{{- define "webapp.host" -}}
 {{- if .Values.route.host }}
 {{- .Values.route.host }}
 {{- else if .Values.route.domain }}
@@ -96,14 +112,14 @@ host name
 {{/*
 all host names
 */}}
-{{- define "generic-app.hosts" -}}
-{{- $hosts := prepend .Values.route.extraHosts (include "generic-app.host" . ) }}
+{{- define "webapp.hosts" -}}
+{{- $hosts := prepend .Values.route.extraHosts (include "webapp.host" . ) }}
 {{- join "@" $hosts }}
 {{- end }}
 
 {{/*
 seal scopes
 */}}
-{{- define "generic-app.seal-scopes" -}}
+{{- define "webapp.seal-scopes" -}}
 {{- list "cluster-wide" "namespace-wide" "strict" }}
 {{- end }}

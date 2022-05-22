@@ -3,16 +3,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "generic-app.fullname" . }}
+  name: {{ include "webapp.fullname" . }}
   labels:
-    {{- include "generic-app.labels" . | nindent 4 }}
+    {{- include "webapp.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "generic-app.selectorLabels" . | nindent 6 }}
+      {{- include "webapp.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
@@ -29,15 +29,15 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "generic-app.selectorLabels" . | nindent 8 }}
+        {{- include "webapp.selectorLabels" . | nindent 8 }}
     spec:
       {{- if .Values.image.pullSecret }}
       imagePullSecrets:
         - name: {{ .Values.image.pullSecret }}
       {{- end }}
       {{- if .Values.serviceAccount.create }}
-      serviceAccount: {{ include "generic-app.serviceAccountName" . }}
-      serviceAccountName: {{ include "generic-app.serviceAccountName" . }}
+      serviceAccount: {{ include "webapp.serviceAccountName" . }}
+      serviceAccountName: {{ include "webapp.serviceAccountName" . }}
       {{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
@@ -46,10 +46,10 @@ spec:
 {{ tpl (toYaml .Values.initContainers) . | indent 8 }}
 {{- end }}
       containers:
-        - name: {{ include "generic-app.fullname" . }}
+        - name: {{ include "webapp.fullname" . }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ include "generic-app.imageRepo" . }}:{{ .Values.image.tag }}"
+          image: '{{ include "webapp.imageRepo" . }}:{{ include "webapp.imageTag" . }}'
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
@@ -61,11 +61,11 @@ spec:
           {{- end }}
           {{- with .Values.envVars }}
             - secretRef:
-                name: {{ include "generic-app.fullname" $ }}-env-vars
+                name: {{ include "webapp.fullname" $ }}-env-vars
           {{- end }}
           {{- with .Values.envVarsSealed }}
             - secretRef:
-                name: {{ include "generic-app.fullname" $ }}-env-vars-sealed
+                name: {{ include "webapp.fullname" $ }}-env-vars-sealed
           {{- end }}
         {{- end }}
           {{- with .Values.livenessProbe }}
@@ -104,7 +104,7 @@ spec:
         - name: config-file
           configMap:
             defaultMode: 420
-            name: {{ include "generic-app.fullname" . }}-file
+            name: {{ include "webapp.fullname" . }}-file
             # items:
             #   - key: {{ .Values.configFile.name }}
             #     path: {{ .Values.configFile.name }}
@@ -112,12 +112,12 @@ spec:
       {{- if .Values.persistence.enabled }}
         - name: pvc-1
           persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (include "generic-app.fullname" .) }}
+            claimName: {{ .Values.persistence.existingClaim | default (include "webapp.fullname" .) }}
       {{- end }}
       {{- if .Values.extraPersistence.enabled }}
         - name: pvc-2
           persistentVolumeClaim:
-            claimName: {{ include "generic-app.fullname" . }}-extra
+            claimName: {{ include "webapp.fullname" . }}-extra
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:

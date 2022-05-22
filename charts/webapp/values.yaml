@@ -1,34 +1,29 @@
-# Default values for generic-app.
+# Default values for webapp.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-openshift: true
+openshift: false
 replicaCount: 1
 image:
   ## tag: latest (check image tag pushed by pipeline service after build)
   tag:
   ## One of two is REQUIRED: either image.repository or image.stream...and NOT both
-  ## repository: .e.g. nexus.elm.sa/zaw-snapshots/myapp
-  ##            it's the full image name , except the tag
-  ##             Useful if the image is outside the internal
-  ##             registry of the OCP cluster (e.g. dev, qa)
-  ##        (check image repo pushed by pipeline service after build)
+  ## repository: .e.g. my.registry/myproject/myapp
   repository:
   ## pullSecret: if repository is private, use pullSecret
-  ##             defaults to nexus
-  pullSecret: 'nexus'
+  pullSecret: ""
   ## imagestream - relative to the Cluster where resources will be deployed
   ##               useful if the image is inside the internal
   ##               registry of the OCP cluster (.e.g staging, prod)
   ##   for example, if the image is availabe in OCP internal registry under
-  ##    this name: "registry.rnd-apps.elm.sa/elm-images/myapp:v1.0.0"
+  ##    this name: "registry.ocp.company.co/ocp-project/myapp:v1.0.0"
   ##    then:
   # stream:
   #   name: myapp
-  #   namespace: elm-images
+  #   namespace: myocp-project
   stream:
     ## imagestream resource name
     name:
-    ## namespace like: elm-images or openshift : depends where is your imagestream
+    ## namespace like: myocp-project : depends where is your imagestream
     ## it defaults to namespace of the RELEASE
     namespace:
     registry: docker-registry.default.svc:5000
@@ -37,15 +32,6 @@ image:
 command: []
 # alternative of command in docker-compose
 args: []
-### registry secret ###
-# if .image.repository points to a repository from nexus.elm.sa,
-# then, .nexus.enabled must equals true in order to authenticate
-# your namespace/project to Nexus container registry
-nexus:
-  enabled: false
-  host: nexus.elm.sa
-  fullnameOverride: nexus
-
 ### more props about deployment ###
 deployment:
   enabled: true
@@ -275,7 +261,7 @@ extraPersistence:
 ## it's List / Array
 initContainers:
   # - name: env-generator
-  #   image: nexus.elm.sa/abdennour/dotenv-to-js-object:4ea
+  #   image: docker.io/abdennour/dotenv-to-js-object:4ea
   #   args:
   #     - --dest=/data
   #     - --env-vars-filter=REACT_APP_
@@ -306,13 +292,13 @@ networkPolicy:
 cronjob:
   enabled: false
   image:
-    # .i.e: nexus.elm.sa/myproject/myapp
+    # .i.e: my.registry/myproject/myapp
     repository:
     # .i.e: 1.0.0-er3299
     tag:
     pullPolicy: IfNotPresent
-    # i.e: nexus
-    pullSecret:
+    # i.e: nexus-registry-secret
+    pullSecret: ""
   restartPolicy: Always # OnFailure
   ## command ------------
   # command:

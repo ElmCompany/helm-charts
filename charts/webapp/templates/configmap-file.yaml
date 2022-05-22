@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "generic-app.fullname" . }}-file
+  name: {{ include "webapp.fullname" . }}-file
   labels:
-    {{- include "generic-app.labels" . | nindent 4 }}
+    {{- include "webapp.labels" . | nindent 4 }}
 data:
   {{ .Values.configFile.name }}: |
     {{ .Values.configFile.content | nindent 4 }}

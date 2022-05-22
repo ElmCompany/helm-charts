@@ -16,18 +16,22 @@ If so, this chart should answer your needs.
 
 # Values
 
-Check default Values of this chart [here]( 
-https://bitbucket.elm.sa/projects/SCL/repos/helm-chart-generic-app/browse/generic-app/values.yaml)
+Check default Values of this chart [here](https://github.com/ElmCompany/helm-charts/blob/master/charts/webapp/values.yaml)
 
 # How to install the app 
 
-Check instructions at right sidebar in [DevOps Appstore](https://appstore.devops.elm.sa/charts/elm/generic-app)
+**Set Elm Repo**
+```sh
+helm repo add elm https://raw.githubusercontent.com/ElmCompany/helm-charts/gh-pages
+helm repo update
+```
 
+**Use it** `helm install elm/webapp`
 
 # Authors
 
 This chart is maintained by: 
-- Abdennour Toumi <atoumi@elm.sa>
+- @abdennour 
 
 # License
 

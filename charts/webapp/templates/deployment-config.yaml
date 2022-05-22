@@ -3,9 +3,9 @@
 apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
 metadata:
-  name: {{ include "generic-app.fullname" . }}
+  name: {{ include "webapp.fullname" . }}
   labels:
-    {{- include "generic-app.labels" . | nindent 4 }}
+    {{- include "webapp.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   revisionHistoryLimit: {{ .Values.deployment.revisionHistoryLimit }}
@@ -14,14 +14,14 @@ spec:
   - imageChangeParams:
       automatic: {{ .Values.deployment.triggers.imageStreamChange }}
       containerNames:
-      - {{ include "generic-app.fullname" . }}
+      - {{ include "webapp.fullname" . }}
       from:
         kind: ImageStreamTag
-        name: {{ printf "%s:%s" (include "generic-app.fullname" .) .Values.image.tag }}
+        name: {{ printf "%s:%s" (include "webapp.fullname" .) .Values.image.tag }}
     type: ImageChange
   selector:
-    {{- include "generic-app.labels" . | nindent 4 }}
-    deploymentconfig: {{ include "generic-app.fullname" . }}
+    {{- include "webapp.labels" . | nindent 4 }}
+    deploymentconfig: {{ include "webapp.fullname" . }}
   revisionHistoryLimit: 10
   strategy:
     activeDeadlineSeconds: 21600
@@ -37,8 +37,8 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "generic-app.labels" . | nindent 8 }}
-        deploymentconfig: {{ include "generic-app.fullname" . }}
+        {{- include "webapp.labels" . | nindent 8 }}
+        deploymentconfig: {{ include "webapp.fullname" . }}
       annotations:
       {{- if .Values.envVars }}
         checksum/configenvvars: {{ include (print $.Template.BasePath "/secret-env-vars.yaml") . | sha256sum }}
@@ -51,8 +51,8 @@ spec:
       {{- end }}
     spec:
     {{- if .Values.serviceAccount.create }}
-      serviceAccount: {{ include "generic-app.serviceAccountName" . }}
-      serviceAccountName: {{ include "generic-app.serviceAccountName" . }}
+      serviceAccount: {{ include "webapp.serviceAccountName" . }}
+      serviceAccountName: {{ include "webapp.serviceAccountName" . }}
     {{- end }}
     {{- if .Values.image.pullSecret }}
       imagePullSecrets:
@@ -63,7 +63,7 @@ spec:
 {{ tpl (toYaml .Values.initContainers) . | indent 8 }}
 {{- end }}
       containers:
-      - name: {{ include "generic-app.fullname" . }}
+      - name: {{ include "webapp.fullname" . }}
         imagePullPolicy: Always
         {{- if .Values.command }}
         command:
@@ -95,11 +95,11 @@ spec:
         {{- end }}
         {{- with .Values.envVars }}
           - secretRef:
-              name: {{ include "generic-app.fullname" $ }}-env-vars
+              name: {{ include "webapp.fullname" $ }}-env-vars
         {{- end }}
         {{- with .Values.envVarsSealed }}
           - secretRef:
-              name: {{ include "generic-app.fullname" $ }}-env-vars-sealed
+              name: {{ include "webapp.fullname" $ }}-env-vars-sealed
         {{- end }}
       {{- end }}
         {{- if .Values.runAsUser }}
@@ -139,7 +139,7 @@ spec:
         - name: config-file
           configMap:
             defaultMode: 420
-            name: {{ include "generic-app.fullname" . }}-file
+            name: {{ include "webapp.fullname" . }}-file
             # items:
             #   - key: {{ .Values.configFile.name }}
             #     path: {{ .Values.configFile.name }}
@@ -147,12 +147,12 @@ spec:
       {{- if .Values.persistence.enabled }}
         - name: pvc-1
           persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (include "generic-app.fullname" .) }}
+            claimName: {{ .Values.persistence.existingClaim | default (include "webapp.fullname" .) }}
       {{- end }}
       {{- if .Values.extraPersistence.enabled }}
         - name: pvc-2
           persistentVolumeClaim:
-            claimName: {{ include "generic-app.fullname" . }}-extra
+            claimName: {{ include "webapp.fullname" . }}-extra
       {{- end }}
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}

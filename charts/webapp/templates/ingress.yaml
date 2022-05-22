@@ -2,22 +2,22 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "generic-app.fullname" $ }}
+  name: {{ include "webapp.fullname" $ }}
   {{- with .Values.route.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
-    {{- include "generic-app.labels" . | nindent 4 }}
+    {{- include "webapp.labels" . | nindent 4 }}
 spec:
   rules:
-  {{- range $index,$host := ( splitList "@" (include "generic-app.hosts" . )) }}
+  {{- range $index,$host := ( splitList "@" (include "webapp.hosts" . )) }}
   - host: {{ $host }}
     http:
       paths:
       - backend:
           service:
-            name: {{ include "generic-app.fullname" $ }}
+            name: {{ include "webapp.fullname" $ }}
             port:
               name: tcp-{{ $.Values.port }}
         pathType: ImplementationSpecific
