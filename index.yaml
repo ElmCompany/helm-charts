@@ -24,6 +24,20 @@ entries:
     urls:
     - https://github.com/ElmCompany/helm-charts/releases/download/docker-daemon-sshd-1.0.1/docker-daemon-sshd-1.0.1.tgz
     version: 1.0.1
+  radius-server:
+  - apiVersion: v2
+    appVersion: 2.2.9
+    created: "2022-05-22T16:09:25.481639919Z"
+    description: Radius Server Helm Chart
+    digest: 249592556d5d0f01cf872a535133928339de69f07f7416d02327c42a9ed29302
+    maintainers:
+    - email: atoumi@elm.sa
+      name: abdennour
+    name: radius-server
+    type: application
+    urls:
+    - https://github.com/ElmCompany/helm-charts/releases/download/radius-server-1.0.0/radius-server-1.0.0.tgz
+    version: 1.0.0
   webapp:
   - apiVersion: v2
     appVersion: latest
@@ -53,4 +67,4 @@ entries:
     urls:
     - https://github.com/ElmCompany/helm-charts/releases/download/webapp-1.2.0/webapp-1.2.0.tgz
     version: 1.2.0
-generated: "2022-05-22T15:43:33.441300524Z"
+generated: "2022-05-22T16:09:25.481652119Z"
