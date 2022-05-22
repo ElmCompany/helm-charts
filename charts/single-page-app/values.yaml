@@ -1,33 +1,34 @@
 # Default values for single-page-app.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-openshift: true
+openshift: false
 replicaCount: 2
 
 ## redirect all HTTP requests to single page (index.html)
 spa: true
+## your app port (container port/ nginx-unprivileged port)
+port: 8080
+extraPorts: []
 image:
   ## tag: latest (check image tag pushed by pipeline service after build)
   tag:
   ## One of two is REQUIRED: either image.repository or image.stream...and NOT both
-  ## repository: .e.g. nexus.elm.sa/zaw-snapshots/myapp
+  ## repository: .e.g. docker.io/myproject/myapp
   ##            it's the full image name , except the tag
-  ##             Useful if the image is outside the internal
-  ##             registry of the OCP cluster (e.g. dev, qa)
   ##        (check image repo pushed by pipeline service after build)
   repository:
   ## pullSecret: if repository is private, use pullSecret
-  ##             defaults to nexus
-  pullSecret: 'nexus'
+  ##             .i.e. nexus
+  pullSecret: ""
   ## imagestream - relative to the Cluster where resources will be deployed
   ##               useful if the image is inside the internal
-  ##               registry of the OCP cluster (.e.g staging, prod)
+  ##               registry of the OCP cluster 
   ##   for example, if the image is availabe in OCP internal registry under
-  ##    this name: "registry.rnd-apps.elm.sa/elm-images/myapp:v1.0.0"
+  ##    this name: "registry.ocp.company.co/myocpproj/myapp:v1.0.0"
   ##    then: 
   # stream:
   #   name: myapp
-  #   namespace: elm-images
+  #   namespace: myocpproj
   stream:
     ## imagestream resource name
     name:
@@ -36,22 +37,12 @@ image:
     namespace:
     registry: docker-registry.default.svc:5000
 
-### registry secret ###
-# if .image.repository points to a repository from nexus.elm.sa, 
-# then, .nexus.enabled must equals true in order to authenticate
-# your namespace/project to Nexus container registry
-nexus:
-  enabled: false
-  host: nexus.elm.sa
-  fullnameOverride: nexus
 webOptimize:
   gzip: true
 
 ####
 ## Environment Variables to be populated inside the container of the app
 # envVars:
-#   SPRING_LOCATION_CONFIG: /opt/app.yaml
-#   SMS_API_PASSWORD: xBlah
 #   REACT_APP_API_URL: https://api.example.com/v2
 envVars: {}
 
@@ -66,8 +57,8 @@ jsEnvFileGenerator:
   filename: 
   mount: /usr/share/nginx/html/assets/conf
   ## help the generator to render only env vars which starts by:
-  envVarsPrefix: NG_APP_
-  # envVarsPrefix: REACT_APP_
+  # envVarsPrefix: NG_APP_
+  envVarsPrefix: REACT_APP_
 
   ### Starter JS code which will be used by the generator
   ## to attach the computed JS object
@@ -79,10 +70,10 @@ jsEnvFileGenerator:
   ## TODO - for now same app image will be reused as initContainer
   # image:
   #   tag: 4ea
-  #   repository: nexus.elm.sa/abdennour/dotenv-to-js-object
+  #   repository: docker.io/abdennour/dotenv-to-js-object
   #   stream:
   #     name:
-  #     namespace: openshift # or may be elm-images
+  #     namespace: openshift
   #     registry: docker-registry.default.svc:5000
 ### more props about deployment ###  
 deployment:
@@ -93,11 +84,7 @@ deployment:
   ## triggers for auto rolling-update pods.
   triggers:
     imageStreamChange: true
-## your app port (container port)
-# port: 5000 # maybe for python app
-# port: 3000 # maybe for nodejs, react app,.. so on
-port: 8080
-extraPorts: []
+
 ## Assiging public Hostname to your app
 route:
   enabled: false
@@ -257,10 +244,3 @@ volumeMounts:
 volumes:
   # - name: data-env
   #   emptyDir: {}
-
-networkPolicy:
-  3scale:
-    enabled: false
-    namespace: 3scale
-    labels:
-      app: APIcast

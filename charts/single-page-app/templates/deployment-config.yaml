@@ -16,7 +16,7 @@ spec:
       - {{ include "single-page-app.fullname" . }}
       from:
         kind: ImageStreamTag
-        name: {{ printf "%s:%s" (include "single-page-app.fullname" .) .Values.image.tag }}
+        name: {{ printf "%s:%s" (include "single-page-app.fullname" .) (include "single-page-app.imageTag" .) }}
     type: ImageChange
   selector:
     {{- include "single-page-app.labels" . | nindent 4 }}
@@ -50,7 +50,7 @@ spec:
     {{- if .Values.envVars }}
       initContainers:
       - name: env-generator
-        image: '{{ include "single-page-app.imageRepo" . }}:{{ .Values.image.tag }}'
+        image: '{{ include "single-page-app.imageRepo" . }}:{{ include "single-page-app.imageTag" . }}'
         command:
           - sh
           - /tmp/scripts/envars-to-js-object

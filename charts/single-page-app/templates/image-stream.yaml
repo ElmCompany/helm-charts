@@ -8,10 +8,10 @@ metadata:
 spec:
   dockerImageRepository: {{ include "single-page-app.imageRepo" . }}
   tags:
-    - name: {{ .Values.image.tag | quote }}
+    - name: {{ (include "single-page-app.imageTag" .) | quote }}
       from:
         kind: DockerImage
-        name: '{{ include "single-page-app.imageRepo" . }}:{{ .Values.image.tag }}'
+        name: '{{ include "single-page-app.imageRepo" . }}:{{ include "single-page-app.imageTag" . }}'
   lookupPolicy:
     local: false
 {{- end }}

@@ -31,7 +31,7 @@ spec:
     {{- if .Values.envVars }}
       initContainers:
       - name: env-generator
-        image: '{{ include "single-page-app.imageRepo" . }}:{{ .Values.image.tag }}'
+        image: '{{ include "single-page-app.imageRepo" . }}:{{ include "single-page-app.imageTag" . }}'
         command:
           - sh
           - /tmp/scripts/envars-to-js-object
@@ -58,7 +58,7 @@ spec:
       containers:
       - name: {{ include "single-page-app.fullname" . }}
         imagePullPolicy: Always
-        image: "{{ include "single-page-app.imageRepo" . }}:{{ .Values.image.tag }}"
+        image: "{{ include "single-page-app.imageRepo" . }}:{{ include "single-page-app.imageTag" . }}"
         ports:
         - name: http
           containerPort: {{ .Values.port }}

@@ -1,28 +1,57 @@
 # Overview
-  Run Single Page Apps (React, VueJS, AngularJS) on top of Nginx while
-  accepting configuration as env vars
-  More details about the history of this [architecture here](https://wiki.elm.sa/display/TAKS/SPA+compliance+with+12factors+and+cloud-native)
+  Run Single Page Apps (React, VueJS, AngularJS) on top of Nginx while accepting configuration as env vars
+  This helm chart implements [this architecture reference](https://www.jeffgeerling.com/blog/2018/deploying-react-single-page-web-app-kubernetes) and specifically, the "Method 3 - Rearchitect the way your React app loads config"
 
 # Prerequisites
 
 1. Make sure that your SPA app is refactored for 12factor compliance, and namely app configuration are externalized not baked with the final JS bundle file.
 
-- **Angular** check tuto [here](https://wiki.elm.sa/display/TAKS/2021/04/26/Tutorial+-+Refactor+Angular+app+for+CICD+Pipeline+Compliance)
+- **React** sample [here](https://github.com/abdennour/cloudnative-implementation/commit/d1413130cccbecde87dc7bf70f32d1e08d647bc2)
 
-- **React** check tuto [here](https://wiki.elm.sa/display/TAKS/2021/04/26/Tutorial+-+Refactor+React+app+for+CICD+Pipeline+Compliance)
+- **Angular** TODO
 
-2. Base your runtime image on `nexus.elm.sa/nginxinc/nginx-unprivileged:1.19-alpine`. Example of Dockerfile [here](https://bitbucket.elm.sa/projects/RM/repos/boilerplate-pipeline/browse/img-frontend.Dockerfile) which is a multistage dockerfile.
+- **Vuejs** TODO
+
+2. Base your runtime image on `docker.io/nginxinc/nginx-unprivileged:1.21-alpine`. Example of Dockerfile below
+
+      <details><summary>show</summary>
+      <p>
+
+      ```Dockerfile
+      ARG REGISTRY=docker.io
+      #### STAGES BUILD ###
+      FROM ${REGISTRY}/node:15-alpine3.13 as dependencies
+      WORKDIR /code
+      COPY package.json package-lock.json ./
+      RUN npm install
+
+      FROM dependencies as build
+      COPY . .
+      RUN npm run build
+
+      #### STAGE RUNTIME ###
+      FROM ${REGISTRY}/nginxinc/nginx-unprivileged:1.21-alpine as runtime
+      COPY --from=build --chown=1001:0 /code/build /usr/share/nginx/html
+      EXPOSE 8080
+      ```
+
+      </p>
+      </details>
 
 3. All app env vars are prefixed with a unified prefix: `REACT_APP_*` with React apps, `NG_APP_` with Angular apps,.. so on
+
 # Values
+`image.repository` or `image.stream` is the required value. Otherwise, Check the other default Values of this chart [here](https://github.com/ElmCompany/helm-charts/blob/master/charts/single-page-app/values.yaml)
 
-Check default Values of this chart [here](
-https://bitbucket.elm.sa/projects/SCL/repos/helm-chart-single-page-app/browse/single-page-app/values.yaml)
+# How to install the app 
 
-# How to install the app
+**Set Elm Repo**
+```sh
+helm repo add elm https://raw.githubusercontent.com/ElmCompany/helm-charts/gh-pages
+helm repo update
+```
 
-Check instructions at right sidebar in [DevOps Appstore](https://appstore.devops.elm.sa/charts/elm/single-page-app)
-
+**Use it** `helm install elm/single-page-app`
 
 # Authors
 

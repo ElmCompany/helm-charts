@@ -72,13 +72,24 @@ Create the name of the service account to use
 
 
 {{/*
-host name
+image repo
 */}}
 {{- define "single-page-app.imageRepo" -}}
 {{- if .Values.image.repository }}
 {{- .Values.image.repository }}
 {{- else }}
 {{- printf "%s/%s/%s" .Values.image.stream.registry .Values.image.stream.namespace .Values.image.stream.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+image tag
+*/}}
+{{- define "single-page-app.imageTag" -}}
+{{- if .Values.image.tag }}
+{{- .Values.image.tag }}
+{{- else }}
+{{- .Chart.AppVersion }}
 {{- end }}
 {{- end }}
 
