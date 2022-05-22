@@ -24,4 +24,33 @@ entries:
     urls:
     - https://github.com/ElmCompany/helm-charts/releases/download/docker-daemon-sshd-1.0.1/docker-daemon-sshd-1.0.1.tgz
     version: 1.0.1
-generated: "2022-05-17T17:15:05.214420042Z"
+  webapp:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2022-05-22T15:43:33.441295524Z"
+    description: 'A Helm chart to install any web application that requires  a single
+      deployment(pod), with a single container. '
+    digest: bdfd79d4ef82d37e998e3998680c5bb22fcdfcc757531a4bb8dbb693d937e523
+    keywords:
+    - webapp
+    - pod
+    - route
+    - web
+    - mount
+    - envvars
+    - dotenv
+    - openshift
+    - ocp3
+    - openshift3
+    - elm
+    maintainers:
+    - email: github@abdennoor.com
+      name: abdennour
+    name: webapp
+    sources:
+    - https://github.com/ElmCompany/helm-charts.git
+    type: application
+    urls:
+    - https://github.com/ElmCompany/helm-charts/releases/download/webapp-1.2.0/webapp-1.2.0.tgz
+    version: 1.2.0
+generated: "2022-05-22T15:43:33.441300524Z"
