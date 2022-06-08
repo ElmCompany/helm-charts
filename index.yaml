@@ -3,6 +3,32 @@ entries:
   docker-daemon-sshd:
   - apiVersion: v2
     appVersion: 20.10.9
+    created: "2022-06-08T02:24:04.035927557Z"
+    description: 'Deploy Remote Docker Daemon exposed thru SSH. Architecture details:
+      https://do.elm.sa/aa0o9 '
+    digest: 6b77ad1acef848fc201cce49352cbc41d50704c0ae0dfd2d86befb61aac5b27e
+    icon: https://themes.devops.elm.sa/icons/docker-daemon-sshd.png
+    keywords:
+    - docker
+    - dind
+    - dockerindocker
+    - daemon
+    - sshd
+    - dockercontext
+    - ci
+    - desktop
+    - dockerdaemon
+    - dockercontextssh
+    maintainers:
+    - email: github@abdennoor.com
+      name: abdennour
+    name: docker-daemon-sshd
+    type: application
+    urls:
+    - https://github.com/ElmCompany/helm-charts/releases/download/docker-daemon-sshd-1.0.2/docker-daemon-sshd-1.0.2.tgz
+    version: 1.0.2
+  - apiVersion: v2
+    appVersion: 20.10.9
     created: "2022-05-17T17:15:05.214414342Z"
     description: 'Deploy Remote Docker Daemon exposed thru SSH. Architecture details:
       https://do.elm.sa/aa0o9 '
@@ -38,7 +64,61 @@ entries:
     urls:
     - https://github.com/ElmCompany/helm-charts/releases/download/radius-server-1.0.0/radius-server-1.0.0.tgz
     version: 1.0.0
+  single-page-app:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2022-06-08T02:24:04.224933273Z"
+    description: 'Run Single Page Apps (React, VueJS, AngularJS) on top of Nginx while
+      accepting configuration as env vars '
+    digest: 0c96368e5391e1a8b880a4f8f3540c5013dcd2e3b63730050c0ff991aaa1fa92
+    icon: https://themes.devops.elm.sa/icons/frontend.png
+    keywords:
+    - single-page-app
+    - react
+    - angular
+    - vuejs
+    - ocp3
+    - openshift3
+    - elm
+    maintainers:
+    - email: atoumi@elm.sa
+      name: abdennour
+    - email: ahalharthi@elm.sa
+      name: ahmed
+    name: single-page-app
+    type: application
+    urls:
+    - https://github.com/ElmCompany/helm-charts/releases/download/single-page-app-1.9.0/single-page-app-1.9.0.tgz
+    version: 1.9.0
   webapp:
+  - apiVersion: v2
+    appVersion: latest
+    created: "2022-06-08T02:24:04.430156574Z"
+    description: 'A Helm chart to install any web application that requires  a single
+      deployment(pod), with a single container. '
+    digest: 0b69c103143ba93766feb6d0411d3809c7138230e73ea71feedbcfde02f73e43
+    keywords:
+    - webapp
+    - pod
+    - route
+    - web
+    - mount
+    - envvars
+    - dotenv
+    - openshift
+    - ocp3
+    - openshift3
+    - elm
+    maintainers:
+    - email: github@abdennoor.com
+      name: abdennour
+    name: webapp
+    sources:
+    - https://github.com/ElmCompany/helm-charts.git
+    type: application
+    urls:
+    - https://github.com/ElmCompany/helm-charts/releases/download/webapp-1.2.1/webapp-1.2.1.tgz
+    version: 1.2.1
   - apiVersion: v2
     appVersion: latest
     created: "2022-05-22T15:43:33.441295524Z"
@@ -67,4 +147,4 @@ entries:
     urls:
     - https://github.com/ElmCompany/helm-charts/releases/download/webapp-1.2.0/webapp-1.2.0.tgz
     version: 1.2.0
-generated: "2022-05-22T16:09:25.481652119Z"
+generated: "2022-06-08T02:24:04.430177274Z"
