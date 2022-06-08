@@ -21,6 +21,8 @@ spec:
             port:
               name: tcp-{{ $.Values.port }}
         pathType: ImplementationSpecific
+        {{- if $.Values.route.path -}}
         path: {{ $.Values.route.path }}
+        {{- end -}}
   {{- end -}}
 {{- end -}}
