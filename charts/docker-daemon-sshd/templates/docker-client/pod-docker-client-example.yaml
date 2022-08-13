@@ -10,8 +10,7 @@ metadata:
     {{- include "docker-daemon-sshd.labels" $ | nindent 4 }}
   namespace: {{ $ns }}
   annotations:
-    "helm.sh/hook": post-install,post-upgrade
-    "helm.sh/hook-delete-policy": before-hook-creation
+    releaseTime: {{ dateInZone "2006-01-02 15:04:05Z" (now) "UTC"| quote }}
 spec:
   restartPolicy: Never
   containers:
