@@ -3,6 +3,32 @@ entries:
   docker-daemon-sshd:
   - apiVersion: v2
     appVersion: 20.10.9
+    created: "2022-08-13T18:55:08.019393187Z"
+    description: 'Deploy Remote Docker Daemon exposed thru SSH. Architecture details:
+      https://do.elm.sa/aa0o9 '
+    digest: 65a325b42d826d0a9eeb8b44a70f6745484f70b908c72d53f0c1f91123b04a20
+    icon: https://themes.devops.elm.sa/icons/docker-daemon-sshd.png
+    keywords:
+    - docker
+    - dind
+    - dockerindocker
+    - daemon
+    - sshd
+    - dockercontext
+    - ci
+    - desktop
+    - dockerdaemon
+    - dockercontextssh
+    maintainers:
+    - email: github@abdennoor.com
+      name: abdennour
+    name: docker-daemon-sshd
+    type: application
+    urls:
+    - https://github.com/ElmCompany/helm-charts/releases/download/docker-daemon-sshd-1.0.4/docker-daemon-sshd-1.0.4.tgz
+    version: 1.0.4
+  - apiVersion: v2
+    appVersion: 20.10.9
     created: "2022-08-13T18:14:56.424814305Z"
     description: 'Deploy Remote Docker Daemon exposed thru SSH. Architecture details:
       https://do.elm.sa/aa0o9 '
@@ -173,4 +199,4 @@ entries:
     urls:
     - https://github.com/ElmCompany/helm-charts/releases/download/webapp-1.2.0/webapp-1.2.0.tgz
     version: 1.2.0
-generated: "2022-08-13T18:14:56.424828506Z"
+generated: "2022-08-13T18:55:08.019420788Z"
