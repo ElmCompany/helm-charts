@@ -9,6 +9,9 @@ metadata:
   labels:
     {{- include "docker-daemon-sshd.labels" $ | nindent 4 }}
   namespace: {{ $ns }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   restartPolicy: Never
   containers:
