@@ -14,7 +14,7 @@ In order to see examples below, make sure to :
 {{- if .Values.sshClient.podExample.enabled }}
 Try to connect to docker clients :
 {{ range $ns := .Values.sshClient.namespaces }}  
-kubectl -n {{ $ns }} exec -it {{ include "docker-daemon-sshd.fullname" $ }}-client-example -c docker-client -- docker ps
+kubectl -n {{ $ns }} exec -it {{ include "docker-daemon-sshd.fullname" $ }}-client-example-0 -c docker-client -- docker ps
 {{- end }}
 {{- end }}
 
