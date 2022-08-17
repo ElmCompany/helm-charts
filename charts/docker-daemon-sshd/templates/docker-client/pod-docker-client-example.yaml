@@ -2,41 +2,53 @@
 {{ $namespaces := append .Values.sshClient.namespaces .Release.Namespace }}
 {{ range $ns := $namespaces }}
 ---
-apiVersion: "v1"
-kind: "Pod"
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
   name: {{ include "docker-daemon-sshd.fullname" $ }}-client-example
   labels:
     {{- include "docker-daemon-sshd.labels" $ | nindent 4 }}
+    role: docker-client
   namespace: {{ $ns }}
   annotations:
     releaseTime: {{ dateInZone "2006-01-02 15:04:05Z" (now) "UTC"| quote }}
 spec:
-  restartPolicy: Never
-  containers:
-  - args:
-    - cat
-    lifecycle:
-      postStart:
-        exec:
-          command:
-          - sh
-          - {{ $.Values.sshClient.mountPath }}/post-start.sh
-    image: "{{ $.Values.sshClient.podExample.imageRepository }}:{{ $.Values.sshClient.podExample.imageTag }}"
-    name: "docker-client"
-    tty: true
-    volumeMounts:
-    - name: docker-ssh-files
-      mountPath: {{ $.Values.sshClient.mountPath }}
-    resources:
-      {{- toYaml $.Values.sshClient.podExample.resources | nindent 6 }}
-  {{- with $.Values.sshClient.podExample.imagePullSecrets }}
-  imagePullSecrets:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-  volumes:
-  - name: docker-ssh-files
-    configMap:
-      name: {{ include "docker-daemon-sshd.fullname" $ }}-ssh-dir
+  replicas: 1
+  serviceName: no-service
+  selector:
+    matchLabels:
+      {{- include "docker-daemon-sshd.selectorLabels" $ | nindent 6 }}
+      role: docker-client
+  template:
+    metadata:
+      labels:
+        {{- include "docker-daemon-sshd.selectorLabels" $ | nindent 8 }}
+        role: docker-client
+    spec:
+      containers:
+      - args:
+        - cat
+        lifecycle:
+          postStart:
+            exec:
+              command:
+              - sh
+              - {{ $.Values.sshClient.mountPath }}/post-start.sh
+        image: "{{ $.Values.sshClient.podExample.imageRepository }}:{{ $.Values.sshClient.podExample.imageTag }}"
+        name: "docker-client"
+        tty: true
+        volumeMounts:
+        - name: docker-ssh-files
+          mountPath: {{ $.Values.sshClient.mountPath }}
+        resources:
+          {{- toYaml $.Values.sshClient.podExample.resources | nindent 10 }}
+      {{- with $.Values.sshClient.podExample.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      - name: docker-ssh-files
+        configMap:
+          name: {{ include "docker-daemon-sshd.fullname" $ }}-ssh-dir
 {{- end }}
 {{- end }}
