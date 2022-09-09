@@ -1,0 +1,36 @@
+{{- if (include "mssql.primary.createConfigmap" .) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "mssql.primary.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: primary
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if .Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+data:
+  # https://github.com/microsoft/mssql-docker/blob/master/linux/sample-helm-chart/templates/mssqlconfig.yaml
+  # More params: https://github.com/Microdust/mssqlserver-docker/blob/master/mssql.conf
+  mssql.conf: |
+    [EULA]
+    accepteula = Y
+    accepteulaml = Y
+    
+    [coredump]
+    captureminiandfull = true
+    coredumptype = full
+    
+    [hadr]
+    hadrenabled = 1
+    
+    [language]
+    lcid = 1033
+    
+    [filelocation]
+    defaultdatadir = /var/opt/mssql/data
+    defaultlogdir = /var/opt/mssql/log
+{{- end -}}

@@ -1,0 +1,11 @@
+# auth:
+#   rootPassword: yGkx8HdgOE
+#   password: jA2Sa1yZWl
+initdbScripts:
+  create_demo_db.sql: |
+    CREATE DATABASE DemoData;
+    GO
+    USE DemoData;
+    GO
+    CREATE TABLE Products (ID int, ProductName nvarchar(max));
+    GO

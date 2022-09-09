@@ -1,0 +1,14 @@
+sshClient:
+  namespaces: ['test-docker-client']
+dind:
+  storageDriver: vfs # overlay2
+  # resources:
+  #   limits:
+  #     cpu: "2000m"
+  #     memory: "4096Mi"
+  #   requests:
+  #     memory: "2048Mi"
+persistence:
+  enabled: true
+  hostPath: /opt/docker-graph-example
+  size: 500Gi
