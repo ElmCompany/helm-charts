@@ -79,9 +79,14 @@ spec:
             - /bin/bash
             - -ec
             - |
-              mkdir -p "/var/opt/mssql/data"
-              chown "{{ .Values.primary.containerSecurityContext.runAsUser }}:{{ .Values.primary.podSecurityContext.fsGroup }}" "/var/opt/mssql/data"
-              find "/var/opt/mssql/data" -mindepth 1 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs -r chown -R "{{ .Values.primary.containerSecurityContext.runAsUser }}:{{ .Values.primary.podSecurityContext.fsGroup }}"
+              mkdir -p "{{ .Values.primary.persistence.mount }}"
+              chown "{{ .Values.primary.containerSecurityContext.runAsUser }}:{{ .Values.primary.podSecurityContext.fsGroup }}" "{{ .Values.primary.persistence.mount }}"
+              find "{{ .Values.primary.persistence.mount }}" -mindepth 1 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs -r chown -R "{{ .Values.primary.containerSecurityContext.runAsUser }}:{{ .Values.primary.podSecurityContext.fsGroup }}"
+              {{- if or .Values.initdbScriptsConfigMap .Values.initdbScripts }}
+                cp -Lr /docker-entrypoint-initdb.d/* /tmp/docker-entrypoint-initdb.d
+                chown "{{ .Values.primary.containerSecurityContext.runAsUser }}:{{ .Values.primary.podSecurityContext.fsGroup }}" /tmp/docker-entrypoint-initdb.d
+                find /tmp/docker-entrypoint-initdb.d -mindepth 1 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs -r chown -R "{{ .Values.primary.containerSecurityContext.runAsUser }}:{{ .Values.primary.podSecurityContext.fsGroup }}"
+              {{- end }}
           securityContext:
             runAsUser: 0
           {{- if .Values.volumePermissions.resources }}
@@ -89,7 +94,13 @@ spec:
           {{- end }}
           volumeMounts:
             - name: data
-              mountPath: /var/opt/mssql/data
+              mountPath: {{ .Values.primary.persistence.mount }}
+          {{- if or .Values.initdbScriptsConfigMap .Values.initdbScripts }}
+            - name: custom-init-scripts-configmap
+              mountPath: /docker-entrypoint-initdb.d
+            - name: custom-init-scripts-dir
+              mountPath: /tmp/docker-entrypoint-initdb.d
+          {{- end }}
         {{- end }}
         {{- if .Values.primary.initContainers }}
         {{- include "common.tplvalues.render" (dict "value" .Values.primary.initContainers "context" $) | nindent 8 }}
@@ -115,6 +126,7 @@ spec:
           lifecycle: {{- include "common.tplvalues.render" (dict "value" .Values.primary.lifecycleHooks "context" $) | nindent 12 }}
           {{- end }}
           env:
+          # https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-configure-environment-variables?view=sql-server-ver16
             - name: ACCEPT_EULA
               value: "Y"
             - name: MSSQL_PID
@@ -139,6 +151,10 @@ spec:
             - name: MSSQL_DATABASE_COLLATE
               value: {{ .Values.auth.databaseCollate | quote }}
             {{- end }}
+            - name: MSSQL_COLLATION
+              value: {{ .Values.auth.databaseCollate | quote }}
+            - name: MSSQL_DATA_DIR
+              value: {{ .Values.primary.persistence.mount }}
             {{- if eq .Values.architecture "replication" }}
             - name: MSSQL_REPLICATION_MODE
               value: "master"
@@ -168,7 +184,7 @@ spec:
             {{- end }}
           ports:
             - name: mssql
-              containerPort: 1443
+              containerPort: {{ .Values.primary.service.ports.mssql }}
           {{- if not .Values.diagnosticMode.enabled }}
           {{- if .Values.primary.livenessProbe.enabled }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" (omit .Values.primary.livenessProbe "enabled") "context" $) | nindent 12 }}
@@ -211,10 +227,10 @@ spec:
             - name: entrypoint
               mountPath: /tmp/entrypoint-scripts
             - name: data
-              mountPath: /var/opt/mssql/data
+              mountPath: {{ .Values.primary.persistence.mount }}
             {{- if or .Values.initdbScriptsConfigMap .Values.initdbScripts }}
-            - name: custom-init-scripts
-              mountPath: /docker-entrypoint-initdb.d
+            - name: custom-init-scripts-dir
+              mountPath: /tmp/docker-entrypoint-initdb.d
             {{- end }}
             {{- if or .Values.primary.configuration .Values.primary.existingConfigmap }}
             - name: config
@@ -232,7 +248,7 @@ spec:
             - name: SERVER
               value: localhost
             - name: PORT
-              value: 4000
+              value: {{ .Values.primary.service.ports.mssql | quote }}
             - name: USERNAME
               value: sa
             - name: PASSWORD
@@ -242,7 +258,7 @@ spec:
                   key: mssql-root-password
           ports:
             - name: metrics
-              containerPort: 4000
+              containerPort: {{ .Values.metrics.service.port }}
           {{- if not .Values.diagnosticMode.enabled }}
           {{- if .Values.metrics.livenessProbe.enabled }}
           livenessProbe: {{- omit .Values.metrics.livenessProbe "enabled" | toYaml | nindent 12 }}
@@ -274,9 +290,11 @@ spec:
             name: {{ include "mssql.primary.configmapName" . }}
         {{- end }}
         {{- if or .Values.initdbScriptsConfigMap .Values.initdbScripts }}
-        - name: custom-init-scripts
+        - name: custom-init-scripts-configmap
           configMap:
             name: {{ include "mssql.initdbScriptsCM" . }}
+        - name: custom-init-scripts-dir
+          emptyDir: {}
         {{- end }}
         {{- if .Values.primary.extraVolumes }}
         {{- include "common.tplvalues.render" (dict "value" .Values.primary.extraVolumes "context" $) | nindent 8 }}

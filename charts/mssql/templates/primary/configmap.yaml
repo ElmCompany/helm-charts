@@ -19,7 +19,7 @@ data:
     [EULA]
     accepteula = Y
     accepteulaml = Y
-    
+
     [coredump]
     captureminiandfull = true
     coredumptype = full
@@ -31,6 +31,6 @@ data:
     lcid = 1033
     
     [filelocation]
-    defaultdatadir = /var/opt/mssql/data
+    defaultdatadir = {{ .Values.primary.persistence.mount }}
     defaultlogdir = /var/opt/mssql/log
 {{- end -}}

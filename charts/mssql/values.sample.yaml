@@ -1,6 +1,6 @@
-# auth:
-#   rootPassword: yGkx8HdgOE
-#   password: jA2Sa1yZWl
+auth:
+  rootPassword: yJHSYfYHD5
+  password: bQ7B71VUdz
 initdbScripts:
   create_demo_db.sql: |
     CREATE DATABASE DemoData;
@@ -9,3 +9,15 @@ initdbScripts:
     GO
     CREATE TABLE Products (ID int, ProductName nvarchar(max));
     GO
+
+##### Monitoring
+metrics:
+  ## @param metrics.enabled Start a side-car prometheus exporter
+  ##
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    namespace: monitoring
+    labels:
+      ### i.e k -n monitoring get servicemonitor -L release
+      release:  monitoring-service

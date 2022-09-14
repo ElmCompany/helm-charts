@@ -13,10 +13,18 @@
 {{- end -}}
 
 {{/*
-Return the proper MySQL image name
+Return the proper MSSQL image name
 */}}
 {{- define "mssql.image" -}}
 {{- include "common.images.image" (dict "imageRoot" .Values.image "global" .Values.global) }}
+{{- end -}}
+
+
+{{/*
+Return the proper MSSQL Client image name
+*/}}
+{{- define "mssql.client.image" -}}
+{{- include "common.images.image" (dict "imageRoot" .Values.client.image "global" .Values.global) }}
 {{- end -}}
 
 {{/*
@@ -65,7 +73,7 @@ Get the initialization scripts ConfigMap name.
 {{- end -}}
 
 {{/*
-Return the configmap with the MySQL Primary configuration
+Return the configmap with the MSSQL Primary configuration
 */}}
 {{- define "mssql.primary.configmapName" -}}
 {{- if .Values.primary.existingConfigmap -}}
@@ -76,7 +84,7 @@ Return the configmap with the MySQL Primary configuration
 {{- end -}}
 
 {{/*
-Return true if a configmap object should be created for MySQL Secondary
+Return true if a configmap object should be created for MSSQL Secondary
 */}}
 {{- define "mssql.primary.createConfigmap" -}}
 {{- if and .Values.primary.configuration (not .Values.primary.existingConfigmap) }}
@@ -86,7 +94,7 @@ Return true if a configmap object should be created for MySQL Secondary
 {{- end -}}
 
 {{/*
-Return the configmap with the MySQL Primary configuration
+Return the configmap with the MSSQL Primary configuration
 */}}
 {{- define "mssql.secondary.configmapName" -}}
 {{- if .Values.secondary.existingConfigmap -}}
@@ -97,7 +105,7 @@ Return the configmap with the MySQL Primary configuration
 {{- end -}}
 
 {{/*
-Return true if a configmap object should be created for MySQL Secondary
+Return true if a configmap object should be created for MSSQL Secondary
 */}}
 {{- define "mssql.secondary.createConfigmap" -}}
 {{- if and (eq .Values.architecture "replication") .Values.secondary.configuration (not .Values.secondary.existingConfigmap) }}
@@ -107,7 +115,7 @@ Return true if a configmap object should be created for MySQL Secondary
 {{- end -}}
 
 {{/*
-Return the secret with MySQL credentials
+Return the secret with MSSQL credentials
 */}}
 {{- define "mssql.secretName" -}}
     {{- if .Values.auth.existingSecret -}}
@@ -118,7 +126,7 @@ Return the secret with MySQL credentials
 {{- end -}}
 
 {{/*
-Return true if a secret object should be created for MySQL
+Return true if a secret object should be created for MSSQL
 */}}
 {{- define "mssql.createSecret" -}}
 {{- if not .Values.auth.existingSecret }}

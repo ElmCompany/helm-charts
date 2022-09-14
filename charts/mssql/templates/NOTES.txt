@@ -1,0 +1,66 @@
+Execute the following to get the administrator credentials:
+
+  echo Username: sa
+  SA_PASSWORD=$(kubectl -n {{ include "common.names.namespace" . }} get secret {{ template "mssql.secretName" . }} -o jsonpath="{.data.mssql-root-password}" | base64 -d)
+
+
+To connect to your database:
+
+  1. Run a pod that you can use as a client:
+
+      kubectl -n {{ include "common.names.namespace" . }} run {{ include "common.names.fullname" . }}-client --rm --tty -i --restart='Never' --image  {{ template "mssql.client.image" . }} --env SA_PASSWORD=$SA_PASSWORD --command -- bash
+
+  2. To connect to primary service (read/write):
+
+      sqlcmd -S {{ include "mssql.primary.fullname" . }}.{{ include "common.names.namespace" . }}.svc.{{ .Values.clusterDomain }} -U sa -P "$SA_PASSWORD" 
+
+{{- if eq .Values.architecture "replication" }}
+
+  3. To connect to secondary service (read-only):
+
+      sqlcmd -S {{ include "mssql.secondary.fullname" . }}.{{ include "common.names.namespace" . }}.svc.{{ .Values.clusterDomain }} -U sa -P "$SA_PASSWORD" 
+
+
+{{- end }}
+
+To execute SQL from file, use command above & append [ -e -i path/to/file.sql ] at the end of the command.
+To execute SQL from string, use command above & append [ -e -Q "select name from sys.databases" ] at the end of the command.
+
+
+To Run your queries after connecting to your database:
+   
+
+  0. Check version
+
+   ```sql
+   select @@version
+   go
+   ```
+
+   1. List databases 
+   ```sql
+    select name from sys.databases
+    go
+   ```
+
+   2. Check collation 
+   ```sql
+   SELECT SERVERPROPERTY('COLLATION')
+   ```
+
+   3. List tables of a database
+
+   ```sql
+   select table_name from YOUR_DATBASE_NAME.information_schema.tables
+   go
+   ```
+
+   4. List data of table 
+
+   ```sql
+   USE YOUR_DATABASE_NAME
+   GO
+   select * from YOUR_TABLE_NAME
+   GO
+
+   ```

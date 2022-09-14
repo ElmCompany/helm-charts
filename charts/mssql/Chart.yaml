@@ -29,4 +29,4 @@ name: mssql
 sources:
   - https://github.com/Microsoft/mssql-docker
   - https://hub.docker.com/_/microsoft-mssql-server
-version: 0.1.1
+version: 1.0.0
