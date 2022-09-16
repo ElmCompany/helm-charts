@@ -7,7 +7,8 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
     tags:
       - bitnami-common
-    version: 2.x.x
+    version: 2.0.3
+    # version: 2.x.x
 description: |
   Microsoft SQL Server is a legacy DBMS.
   Ease Migrating to Cloud Native without focusing on migrating your DBMS as first steps.

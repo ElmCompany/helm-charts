@@ -29,6 +29,9 @@ jobs:
       - name: Add Helm repositories from dependencies
         run: |
           helm repo add bitnami https://charts.bitnami.com/bitnami
+          for dir in $(ls -d charts/*/); do
+            helm dependency list $dir 2> /dev/null | grep http | awk '{ print "helm repo add " $1 " " $3 }' | while read cmd; do echo $cmd; done
+          done
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.4.0
         with:
