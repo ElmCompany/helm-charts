@@ -1,5 +1,5 @@
 # MS SQL Packaged By Elm
-Microsoft SQL Server is still used by many legacy organizations. And migration to Cloud native can be a blocked by having this technology.
+Microsoft SQL Server is still used by many organizations. And migration to Cloud native can be a blocked by having this technology.
 In order to help organization to lift-shift to Cloud Native, they can run also MS SQL in kubernetes via this Helm chart
 
 # TL;DR
