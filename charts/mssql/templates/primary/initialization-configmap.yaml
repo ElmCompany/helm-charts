@@ -13,5 +13,8 @@ metadata:
   annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
   {{- end }}
 data:
+{{- if .Values.auth.username }}
+{{ (tpl (.Files.Glob "files/sql/00_create_db_owner_user.sql").AsConfig .) | indent 2}}
+{{- end }}
 {{- include "common.tplvalues.render" (dict "value" .Values.initdbScripts "context" .) | nindent 2 }}
 {{- end }}

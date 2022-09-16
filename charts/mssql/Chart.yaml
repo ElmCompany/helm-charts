@@ -17,6 +17,7 @@ home: https://github.com/ElmCompany/helm-charts/tree/master/charts/mssql
 icon: https://avatars.githubusercontent.com/u/42203338?s=400&u=4ac258862da8520b17dc9877ff54de6f04569d9f&v=4
 keywords:
   - mssql
+  - microsoftsql
   - database
   - dbms
   - sql
@@ -29,4 +30,4 @@ name: mssql
 sources:
   - https://github.com/Microsoft/mssql-docker
   - https://hub.docker.com/_/microsoft-mssql-server
-version: 1.0.0
+version: 1.2.0

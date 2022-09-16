@@ -126,7 +126,7 @@ auth:
   ## @param auth.databaseCollate COLLATE for a custom database to create
   ## examples: SQL_Latin1_General_CP1_CI_AS
   databaseCollate: Arabic_CI_AS
-  ## @param auth.username Name for a custom user to create
+  ## @param auth.username Name for a custom user to create on master db as well as in [.Values.auth.database]
   ## ref: https://github.com/bitnami/containers/tree/main/bitnami/mssql#creating-a-database-user-on-first-run
   ##
   username: ""
@@ -136,6 +136,13 @@ auth:
   ## @param auth.replicationUser MSSQL replication user
   ## ref: https://github.com/bitnami/containers/tree/main/bitnami/mssql#setting-up-a-replication-cluster
   ##
+  ## @param auth.createLogin 
+  ##      if Yes, the .Values.auth.username is a local user..
+  ##      IF No, the .Values.auth.username is a domain user
+  ##      If .Values.auth.username not defined, .this param has no effect 
+  ## ref: https://github.com/bitnami/containers/tree/main/bitnami/mssql#creating-a-database-user-on-first-run
+  ##
+  createLogin: true
   replicationUser: replicator
   ## @param auth.replicationPassword MSSQL replication user password. Ignored if existing secret is provided
   ##
@@ -145,12 +152,16 @@ auth:
   ##
   existingSecret: ""
 ## @param initdbScripts Dictionary of initdb scripts
-## Specify dictionary of scripts to be run at first boot
+## Specify dictionary of SQL scripts to be run at first boot
+## These scripts works with Scripting Variables including:
+##     MSSQL_DATABASE ( which is .Values.auth.database)
+## ref: https://docs.microsoft.com/en-us/sql/ssms/scripting/sqlcmd-use-with-scripting-variables?view=sql-server-ver16
 ## Example:
 ## initdbScripts:
 ##   my_init_script.sql: |
-##      #!/bin/bash
-##      echo "Do something."
+##      USE [master]
+##      SELECT name FROM sys.databases
+##      GO
 ##
 initdbScripts: {}
 ## @param initdbScriptsConfigMap ConfigMap with the initdb scripts (Note: Overrides `initdbScripts`)

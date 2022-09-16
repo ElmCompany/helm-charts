@@ -28,11 +28,8 @@ function db_init() {
 
     if [ ! -f "${IS_SQLSCRIPTS_INITIALIZED}" ]; then
       for f in $(ls $DB_INIT_SCRIPTS_DIR/*.sql 2> /dev/null); do
-      {{- if and .Values.auth.createDatabase .Values.auth.database }}
-        sed -i "s/<DB_NAME>/${MSSQL_DATABASE}/g" $f
-      {{- end }}
         echo "- running init db script $f .."
-        result=$(/opt/mssql-tools/bin/sqlcmd -U sa -P "$SA_PASSWORD" -i "$f")
+        result=$(/opt/mssql-tools/bin/sqlcmd -U sa -P "$SA_PASSWORD" -v MSSQL_PASSWORD="${MSSQL_PASSWORD}" -v MSSQL_DATABASE="${MSSQL_DATABASE}" -i "$f")
         echo "- result: $result"
       done
       if [ "$?" = "0" ]; then
