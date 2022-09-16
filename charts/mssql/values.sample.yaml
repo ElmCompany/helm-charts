@@ -1,0 +1,31 @@
+auth:
+  rootPassword: yJHSYfYHD5
+  username: demouser
+  password: bQ7B71VUdz
+initdbScripts:
+  create_demo_db.sql: |
+    CREATE DATABASE DemoData;
+    GO
+    USE DemoData;
+    CREATE TABLE Products (ID int, ProductName nvarchar(max));
+    GO
+    INSERT INTO [dbo].[Products] ([ID],[ProductName]) VALUES (1,'Bra')
+    INSERT INTO [dbo].[Products] ([ID],[ProductName]) VALUES (2,'Jija')
+    INSERT INTO [dbo].[Products] ([ID],[ProductName]) VALUES (3,'Karbaaras')
+    INSERT INTO [dbo].[Products] ([ID],[ProductName]) VALUES (4,'Toffeh')
+    INSERT INTO [dbo].[Products] ([ID],[ProductName]) VALUES (4,'Khookh')
+    GO
+    SELECT TOP (10) [ID],[ProductName]
+      FROM [DemoData].[dbo].[Products]
+    GO
+##### Monitoring
+metrics:
+  ## @param metrics.enabled Start a side-car prometheus exporter
+  ##
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    namespace: monitoring
+    labels:
+      ### i.e k -n monitoring get servicemonitor -L release
+      release:  monitoring-service

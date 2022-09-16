@@ -1,0 +1,33 @@
+annotations:
+  category: Database
+apiVersion: v2
+appVersion: 2022
+dependencies:
+  - name: common
+    repository: https://charts.bitnami.com/bitnami
+    tags:
+      - bitnami-common
+    version: 2.x.x
+description: |
+  Microsoft SQL Server is a legacy DBMS.
+  Ease Migrating to Cloud Native without focusing on migrating your DBMS as first steps.
+  Once you settle down on cloud native environment, you can migrate DB to something cloud native
+engine: gotpl
+home: https://github.com/ElmCompany/helm-charts/tree/master/charts/mssql
+icon: https://avatars.githubusercontent.com/u/42203338?s=400&u=4ac258862da8520b17dc9877ff54de6f04569d9f&v=4
+keywords:
+  - mssql
+  - microsoftsql
+  - database
+  - dbms
+  - sql
+  - cluster
+  - high availability
+maintainers:
+  - name: Elm
+    url: https://github.com/ElmCompany/helm-charts
+name: mssql
+sources:
+  - https://github.com/Microsoft/mssql-docker
+  - https://hub.docker.com/_/microsoft-mssql-server
+version: 1.2.0
