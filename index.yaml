@@ -3,6 +3,32 @@ entries:
   docker-daemon-sshd:
   - apiVersion: v2
     appVersion: 20.10.9
+    created: "2022-09-16T18:15:22.550222062Z"
+    description: 'Deploy Remote Docker Daemon exposed thru SSH. Architecture details:
+      https://do.elm.sa/aa0o9 '
+    digest: ea8c109935089406c939859042978604a37b7d252fbfeb0036fd61a70f77a1e8
+    icon: https://themes.devops.elm.sa/icons/docker-daemon-sshd.png
+    keywords:
+    - docker
+    - dind
+    - dockerindocker
+    - daemon
+    - sshd
+    - dockercontext
+    - ci
+    - desktop
+    - dockerdaemon
+    - dockercontextssh
+    maintainers:
+    - email: github@abdennoor.com
+      name: abdennour
+    name: docker-daemon-sshd
+    type: application
+    urls:
+    - https://github.com/ElmCompany/helm-charts/releases/download/docker-daemon-sshd-1.0.8/docker-daemon-sshd-1.0.8.tgz
+    version: 1.0.8
+  - apiVersion: v2
+    appVersion: 20.10.9
     created: "2022-08-17T03:51:34.420712193Z"
     description: 'Deploy Remote Docker Daemon exposed thru SSH. Architecture details:
       https://do.elm.sa/aa0o9 '
@@ -154,6 +180,42 @@ entries:
     urls:
     - https://github.com/ElmCompany/helm-charts/releases/download/docker-daemon-sshd-1.0.1/docker-daemon-sshd-1.0.1.tgz
     version: 1.0.1
+  mssql:
+  - annotations:
+      category: Database
+    apiVersion: v2
+    appVersion: "2022"
+    created: "2022-09-16T18:15:22.685711741Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - bitnami-common
+      version: 2.0.3
+    description: 'Microsoft SQL Server is a legacy DBMS. Ease Migrating to Cloud Native
+      without focusing on migrating your DBMS as first steps. Once you settle down
+      on cloud native environment, you can migrate DB to something cloud native '
+    digest: b1322afe80780eef2ce0a92173777b4d5c1f1c26ea2b8e7e7fc714bcde528af3
+    home: https://github.com/ElmCompany/helm-charts/tree/master/charts/mssql
+    icon: https://avatars.githubusercontent.com/u/42203338?s=400&u=4ac258862da8520b17dc9877ff54de6f04569d9f&v=4
+    keywords:
+    - mssql
+    - microsoftsql
+    - database
+    - dbms
+    - sql
+    - cluster
+    - high availability
+    maintainers:
+    - name: Elm
+      url: https://github.com/ElmCompany/helm-charts
+    name: mssql
+    sources:
+    - https://github.com/Microsoft/mssql-docker
+    - https://hub.docker.com/_/microsoft-mssql-server
+    urls:
+    - https://github.com/ElmCompany/helm-charts/releases/download/mssql-1.2.1/mssql-1.2.1.tgz
+    version: 1.2.1
   radius-server:
   - apiVersion: v2
     appVersion: 2.2.9
@@ -251,4 +313,4 @@ entries:
     urls:
     - https://github.com/ElmCompany/helm-charts/releases/download/webapp-1.2.0/webapp-1.2.0.tgz
     version: 1.2.0
-generated: "2022-08-17T03:51:34.420733994Z"
+generated: "2022-09-16T18:15:22.685868541Z"
