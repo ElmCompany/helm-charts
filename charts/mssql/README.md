@@ -1,16 +1,24 @@
-> WE ARE WELCOMING YOUR CONTRIBUTION
+# MS SQL Packaged By Elm
+Microsoft SQL Server is still used by many legacy organizations. And migration to Cloud native can be a blocked by having this technology.
+In order to help organization to lift-shift to Cloud Native, they can run also MS SQL in kubernetes via this Helm chart
 
-# Microsoft SQL Server Helm Chart
+# TL;DR
+helm repo add elm https://raw.githubusercontent.com/ElmCompany/helm-charts/gh-pages
+helm install my-db elm/mssql
 
-TODO
+# Values
 
-# Design
+Check default Values of this chart [here](https://github.com/ElmCompany/helm-charts/blob/master/charts/mssql/values.yaml)
 
-- Design it as per Bitnami Helm charts: https://github.com/bitnami/charts/blob/master/bitnami/mssql/values.yaml
-- Design for `architecture: replication` using this sample: `https://github.com/microsoft/sql-server-samples/blob/master/samples/containers/replication/docker-compose.yml`
 
-# Implement
-- Implement it as per this chart: https://github.com/microsoft/mssql-docker/blob/master/linux/sample-helm-chart/values.yaml
-- Customize entrypoint with init scripts and others: https://github.com/twright-msft/mssql-node-docker-demo-app
 
-- Persistence for data/logs/backup: https://gist.github.com/dbafromthecold/3dd0330afce4c7d1c08612bf393f9c99
+**Use it** `helm install elm/webapp`
+
+# Authors
+
+This chart is maintained by: 
+- @abdennour 
+
+# License
+
+LGPL v3
