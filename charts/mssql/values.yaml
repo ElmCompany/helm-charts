@@ -935,6 +935,115 @@ volumePermissions:
   ##
   resources: {}
 
+## @section MSSQL Backup parameters
+##   ref: https://docs.microsoft.com/en-us/sql/linux/tutorial-restore-backup-in-sql-server-container?view=sql-server-ver16
+backup:
+  ## @param backup.enabled Enable backup features
+  ##
+  enabled: true
+  ## @param.backup.databases list of databases target for backup every .Values.backup.cronjob.schedule
+  ##
+  databases: []
+  cronjob:
+    ## @param backup.cronjob.schedule TODO Enable auto backup every specific period of time - TODO !!!
+    ##   defaults to every day at At 01:00
+    schedule: "0 1 * * *"
+    ## @param backup.cronjob.commandTemplate TODO backup command template to be run by "sqlcmd" every .Values.backup.schedule - TODO !!!
+    ##   it is a template that can interpolate:
+    ##      1. Any Values of this chart
+    ##      2. The following env vars: 
+    ##          - $database : database as it was mentioned in .Values.backup.databases[i]
+    ##          - $now: current time in this format %Y-%m-%d_%Hh%Mm%Ssec
+    ## 
+    ## !!!! NOTE !!!!
+    ## Recommended to not override this value as the restore script is 
+    ##     developed based on this default value of @param backup.cronjob.commandTemplate.
+    ## !!!!!!!!!!!!!!
+    ## ref: https://learn.microsoft.com/en-us/sql/t-sql/statements/backup-transact-sql?view=sql-server-ver16
+    ## ref: https://docs.microsoft.com/en-us/sql/linux/tutorial-restore-backup-in-sql-server-container?view=sql-server-ver16#create-a-new-backup
+    ##
+    commandTemplate: BACKUP DATABASE [$database] TO DISK = N'{{ .Values.backup.persistence.mount }}/$database-$now.bak' WITH NOFORMAT, NOINIT, NAME = '${database}Backup', SKIP, NOREWIND, NOUNLOAD, STATS = 10
+    ## @param backup.cronjob.historyLimit Number of successful finished jobs to retain
+    ##
+    historyLimit: 1
+    ## @param backup.cronjob.snapshotHistoryLimit Number of etcd snapshots to retain, tagged by date
+    ##
+    snapshotHistoryLimit: 1
+    ## @param backup.cronjob.podAnnotations [object] Pod annotations for cronjob pods
+    ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+    ##
+    podAnnotations: {}
+    ## @param backup.cronjob.podSecurityContext [object]
+    ##
+    podSecurityContext: {}
+    ## MSSQL backup.cronjob container security context
+    ##
+    containerSecurityContext: {}
+    ## Configure resource requests and limits for snapshotter containers
+    ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
+    ## We usually recommend not to specify default resources and to leave this as a conscious
+    ## choice for the user. This also increases chances charts run on environments with little
+    ## resources, such as Minikube. If you do want to specify resources, uncomment the following
+    ## lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    ## @param backup.cronjob.resources.limits [object] Cronjob container resource limits
+    ## @param backup.cronjob.resources.requests [object] Cronjob container resource requests
+    ##
+    resources:
+      ## Example:
+      ## limits:
+      ##    cpu: 500m
+      ##    memory: 1Gi
+      ##
+      limits: {}
+      requests: {}
+
+    ## @param backup.cronjob.nodeSelector Node labels for cronjob pods assignment
+    ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+    ##
+    nodeSelector: {}
+    ## @param backup.cronjob.tolerations Tolerations for cronjob pods assignment
+    ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+    ##
+    tolerations: []
+
+  
+  ## Persistence for Backup files
+  ##
+  persistence:
+    ## @param backup.persistence.enabled Enable persisting Backups on MSSQL primary replicas using a `PersistentVolumeClaim`. If false, use emptyDir
+    ##
+    enabled: false
+    ## @param backup.persistence.mount Path of Data inside container
+    ##
+    mount: /var/opt/mssql/backup
+    ## @param backup.persistence.existingClaim Name of an existing `PersistentVolumeClaim` for Backups on MSSQL primary replicas
+    ## NOTE: When it's set the rest of persistence parameters are ignored
+    ##
+    existingClaim: ""
+    ## @param backup.persistence.storageClass Backup MSSQL primary persistent volume storage Class
+    ## If defined, storageClassName: <storageClass>
+    ## If set to "-", storageClassName: "", which disables dynamic provisioning
+    ## If undefined (the default) or set to null, no storageClassName spec is
+    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+    ##   GKE, AWS & OpenStack)
+    ##
+    storageClass: ""
+    ## @param backup.persistence.annotations Backup MSSQL primary persistent volume claim annotations
+    ##
+    annotations: {}
+    ## @param backup.persistence.accessModes Backup MSSQL primary persistent volume access Modes
+    ##
+    accessModes:
+      - ReadWriteOnce
+    ## @param backup.persistence.size Backup MSSQL primary persistent volume size
+    ##
+    size: 20Gi
+    ## @param backup.persistence.selector Selector to match an existing Persistent Volume
+    ## selector:
+    ##   matchLabels:
+    ##     app: my-app
+    ##
+    selector: {}
 ## @section Metrics parameters
 
 ## MsSQLd Prometheus exporter parameters
