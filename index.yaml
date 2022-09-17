@@ -185,6 +185,42 @@ entries:
       category: Database
     apiVersion: v2
     appVersion: "2022"
+    created: "2022-09-17T19:00:10.21759623Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - bitnami-common
+      version: 2.0.3
+    description: 'Microsoft SQL Server is a DBMS used by many organizations. Ease
+      Migrating your SQL Servers to Cloud Native by leveraging this Helm chart. >
+      **DISCLAIMER** > BY DEPLOYING THIS HELM CHART, YOU ARE ACCEPTING THE [END-USER
+      Licensing Agreement of Microsoft SQL Server](https://go.microsoft.com/fwlink/?LinkId=746388) '
+    digest: be53bdcbd990c8a21c433a3ad2395bd9737a0a23addbdaef392e27913945eea9
+    home: https://github.com/ElmCompany/helm-charts/tree/master/charts/mssql
+    icon: https://avatars.githubusercontent.com/u/42203338?s=400&u=4ac258862da8520b17dc9877ff54de6f04569d9f&v=4
+    keywords:
+    - mssql
+    - microsoftsql
+    - database
+    - dbms
+    - sql
+    - cluster
+    - high availability
+    maintainers:
+    - name: Elm
+      url: https://github.com/ElmCompany/helm-charts
+    name: mssql
+    sources:
+    - https://github.com/Microsoft/mssql-docker
+    - https://hub.docker.com/_/microsoft-mssql-server
+    urls:
+    - https://github.com/ElmCompany/helm-charts/releases/download/mssql-1.3.0/mssql-1.3.0.tgz
+    version: 1.3.0
+  - annotations:
+      category: Database
+    apiVersion: v2
+    appVersion: "2022"
     created: "2022-09-16T18:15:22.685711741Z"
     dependencies:
     - name: common
@@ -313,4 +349,4 @@ entries:
     urls:
     - https://github.com/ElmCompany/helm-charts/releases/download/webapp-1.2.0/webapp-1.2.0.tgz
     version: 1.2.0
-generated: "2022-09-16T18:15:22.685868541Z"
+generated: "2022-09-17T19:00:10.217750232Z"
