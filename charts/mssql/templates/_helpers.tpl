@@ -8,6 +8,10 @@
 {{- end -}}
 {{- end -}}
 
+{{- define "mssql.primary.hasVolumeClaims" -}}
+{{- or (and .Values.primary.persistence.enabled (not .Values.primary.persistence.existingClaim)) (and .Values.backup.persistence.enabled (not .Values.backup.persistence.existingClaim)) -}}
+{{- end -}}
+
 {{- define "mssql.secondary.fullname" -}}
 {{- printf "%s-%s" (include "common.names.fullname" .) .Values.secondary.name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
@@ -166,4 +170,12 @@ Compile all warnings into a single message, and call fail.
 {{- if $message -}}
 {{- printf "\nVALUES VALIDATION:\n%s" $message | fail -}}
 {{- end -}}
+{{- end -}}
+
+{{/*
+Compute all databases that requires backup
+*/}}
+{{- define "mssql.backup.databases" -}}
+{{- $databases := prepend .Values.backup.databases .Values.auth.database }}
+{{- $databases -}}
 {{- end -}}

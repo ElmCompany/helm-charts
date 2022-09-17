@@ -22,6 +22,19 @@ To connect to your database:
 
 
 {{- end }}
+{{- if .Values.backup.enabled }}
+
+   4. To take a backup (.i.e. boostrapped DB {{ .Values.auth.database }} initiated by the helm release): 
+
+        sqlcmd \
+          -S {{ include "mssql.primary.fullname" . }}.{{ include "common.names.namespace" . }}.svc.{{ .Values.clusterDomain }} \
+          -U sa \
+          -P "$SA_PASSWORD" \
+          -e -Q "BACKUP DATABASE [{{ .Values.auth.database }}] TO DISK = N'{{ .Values.backup.persistence.mount }}/{{ .Values.auth.database }}-$(date +%Y-%m-%d_%Hh%Mm%Ssec).bak' WITH NOFORMAT, NOINIT, NAME = '{{ .Values.auth.database }}backup', SKIP, NOREWIND, NOUNLOAD, STATS = 10"
+
+    ref: https://docs.microsoft.com/en-us/sql/linux/tutorial-restore-backup-in-sql-server-container?view=sql-server-ver16
+{{- end }}
+
 
 To execute SQL from file, use command above & append [ -e -i path/to/file.sql ] at the end of the command.
 To execute SQL from string, use command above & append [ -e -Q "select name from sys.databases" ] at the end of the command.
@@ -64,3 +77,22 @@ To Run your queries after connecting to your database:
    GO
 
    ```
+{{- if not .Values.backup.persistence.enabled }}
+#################################################################################
+######   WARNING: Persistence is disabled for BACKUPs !!!                    #####
+######  !!! You will lose your  backups when                                #####
+######            the primary pod is terminated.                            #####
+########   Check @param backup.persistence.enabled to metigate this      ######## 
+#################################################################################
+{{- end }}
+
+
+#################################################################################
+#######################        DISCLAIMER        ################################
+#################################################################################
+BY DEPLOYING THIS HELM CHART, YOU ARE ACCEPTING THE END-USER Licensing Agreement 
+  of Microsoft SQL Server:
+     https://go.microsoft.com/fwlink/?LinkId=746388
+IF YOU ARE NOT ACCEPTING THAT LICENSE, YOU MUST DELETE THIS RELEASE IMMEDIATELY: 
+    # helm -n {{ .Release.Namespace }} delete {{ .Release.Name }}
+#################################################################################

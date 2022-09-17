@@ -79,9 +79,10 @@ spec:
             - /bin/bash
             - -ec
             - |
-              mkdir -p "{{ .Values.primary.persistence.mount }}"
-              chown "{{ .Values.primary.containerSecurityContext.runAsUser }}:{{ .Values.primary.podSecurityContext.fsGroup }}" "{{ .Values.primary.persistence.mount }}"
+              mkdir -p "{{ .Values.primary.persistence.mount }}" "{{ .Values.backup.persistence.mount }}"
+              chown "{{ .Values.primary.containerSecurityContext.runAsUser }}:{{ .Values.primary.podSecurityContext.fsGroup }}" "{{ .Values.primary.persistence.mount }}" "{{ .Values.backup.persistence.mount }}"
               find "{{ .Values.primary.persistence.mount }}" -mindepth 1 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs -r chown -R "{{ .Values.primary.containerSecurityContext.runAsUser }}:{{ .Values.primary.podSecurityContext.fsGroup }}"
+              find "{{ .Values.backup.persistence.mount }}" -mindepth 1 -maxdepth 1 -not -name ".snapshot" -not -name "lost+found" | xargs -r chown -R "{{ .Values.primary.containerSecurityContext.runAsUser }}:{{ .Values.primary.podSecurityContext.fsGroup }}"
               {{- if or .Values.initdbScriptsConfigMap .Values.initdbScripts }}
                 cp -Lr /docker-entrypoint-initdb.d/* /tmp/docker-entrypoint-initdb.d
                 chown "{{ .Values.primary.containerSecurityContext.runAsUser }}:{{ .Values.primary.podSecurityContext.fsGroup }}" /tmp/docker-entrypoint-initdb.d
@@ -95,6 +96,8 @@ spec:
           volumeMounts:
             - name: data
               mountPath: {{ .Values.primary.persistence.mount }}
+            - name: backup
+              mountPath: {{ .Values.backup.persistence.mount }}
           {{- if or .Values.initdbScriptsConfigMap .Values.initdbScripts }}
             - name: custom-init-scripts-configmap
               mountPath: /docker-entrypoint-initdb.d
@@ -155,6 +158,8 @@ spec:
               value: {{ .Values.auth.databaseCollate | quote }}
             - name: MSSQL_DATA_DIR
               value: {{ .Values.primary.persistence.mount }}
+            - name: MSSQL_BACKUP_DIR
+              value: {{ .Values.backup.persistence.mount }}
             {{- if eq .Values.architecture "replication" }}
             - name: MSSQL_REPLICATION_MODE
               value: "master"
@@ -228,6 +233,8 @@ spec:
               mountPath: /tmp/entrypoint-scripts
             - name: data
               mountPath: {{ .Values.primary.persistence.mount }}
+            - name: backup
+              mountPath: {{ .Values.backup.persistence.mount }}
             {{- if or .Values.initdbScriptsConfigMap .Values.initdbScripts }}
             - name: custom-init-scripts-dir
               mountPath: /tmp/docker-entrypoint-initdb.d
@@ -306,8 +313,19 @@ spec:
   {{- else if not .Values.primary.persistence.enabled }}
         - name: data
           emptyDir: {}
-  {{- else if and .Values.primary.persistence.enabled (not .Values.primary.persistence.existingClaim) }}
+  {{- end }}
+  {{- if and .Values.backup.persistence.enabled .Values.backup.persistence.existingClaim }}
+        - name: backup
+          persistentVolumeClaim:
+            claimName: {{ tpl .Values.backup.persistence.existingClaim . }}
+  {{- else if not .Values.backup.persistence.enabled }}
+        - name: backup
+          emptyDir: {}
+  {{- end }}
+  {{- if (include "mssql.primary.hasVolumeClaims" .) }}
   volumeClaimTemplates:
+  {{- end }}
+  {{- if and .Values.primary.persistence.enabled (not .Values.primary.persistence.existingClaim) }}
     - metadata:
         name: data
         labels: {{ include "common.labels.matchLabels" . | nindent 10 }}
@@ -333,5 +351,33 @@ spec:
         {{- include "common.storage.class" (dict "persistence" .Values.primary.persistence "global" .Values.global) | nindent 8 }}
         {{- if .Values.primary.persistence.selector }}
         selector: {{- include "common.tplvalues.render" (dict "value" .Values.primary.persistence.selector "context" $) | nindent 10 }}
+        {{- end -}}
+  {{- end }}
+  {{- if and .Values.backup.persistence.enabled (not .Values.backup.persistence.existingClaim) }}
+    - metadata:
+        name: backup
+        labels: {{ include "common.labels.matchLabels" . | nindent 10 }}
+          app.kubernetes.io/component: primary
+          {{- if .Values.commonLabels }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.commonLabels "context" $) | nindent 10 }}
+          {{- end }}
+        annotations:
+          {{- if .Values.backup.persistence.annotations }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.backup.persistence.annotations "context" $) | nindent 10 }}
+          {{- end }}
+          {{- if .Values.commonAnnotations }}
+          {{- include "common.tplvalues.render" (dict "value" .Values.commonAnnotations "context" $) | nindent 10 }}
+          {{- end }}
+      spec:
+        accessModes:
+          {{- range .Values.backup.persistence.accessModes }}
+          - {{ . | quote }}
+          {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.backup.persistence.size | quote }}
+        {{- include "common.storage.class" (dict "persistence" .Values.backup.persistence "global" .Values.global) | nindent 8 }}
+        {{- if .Values.backup.persistence.selector }}
+        selector: {{- include "common.tplvalues.render" (dict "value" .Values.backup.persistence.selector "context" $) | nindent 10 }}
         {{- end -}}
   {{- end }}

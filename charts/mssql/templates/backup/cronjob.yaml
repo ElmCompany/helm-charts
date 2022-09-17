@@ -1,0 +1,77 @@
+{{- $databases := .Values.backup.databases -}}
+{{- if .Values.backup.enabled }}
+{{ range $_, $database := $databases }}
+{{- $databaseKebab := (regexReplaceAll "\\W+" $database "-" | lower ) -}}
+{{ $databaseKebab = (trimSuffix "-" $databaseKebab ) }}
+{{ $databaseKebab = (regexReplaceAll "_" $databaseKebab "-" ) }}
+---
+apiVersion: {{ include "common.capabilities.cronjob.apiVersion" $ }}
+kind: CronJob
+metadata:
+  name: {{ printf "%s-snapshotter-db-%s" (include "common.names.fullname" $) $databaseKebab }}
+  labels: {{- include "common.labels.standard" $ | nindent 4 }}
+    {{- if $.Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" $.Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  {{- if $.Values.commonAnnotations }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $.Values.commonAnnotations "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  concurrencyPolicy: Forbid
+  schedule: {{ $.Values.backup.cronjob.schedule | quote }}
+  successfulJobsHistoryLimit: {{ $.Values.backup.cronjob.historyLimit }}
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels: {{- include "common.labels.standard" $ | nindent 12 }}
+            app.kubernetes.io/component: snapshotter
+          {{- if $.Values.backup.cronjob.podAnnotations }}
+          annotations: {{- include "common.tplvalues.render" ( dict "value" $.Values.backup.cronjob.podAnnotations "context" $) | nindent 12 }}
+          {{- end }}
+        spec:
+          {{- if $.Values.backup.cronjob.nodeSelector }}
+          nodeSelector: {{-  toYaml $.Values.backup.cronjob.nodeSelector | nindent 12  }}
+          {{- end }}
+          {{- if $.Values.backup.cronjob.tolerations }}
+          tolerations: {{- toYaml $.Values.backup.cronjob.tolerations | nindent 12 }}
+          {{- end }}
+          {{- include "mssql.imagePullSecrets" $ | nindent 10 }}
+          restartPolicy: OnFailure
+          {{- if $.Values.backup.cronjob.podSecurityContext.enabled }}
+          securityContext: {{- omit $.Values.backup.cronjob.podSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: mssql-snapshotter
+              image: {{ template "mssql.client.image" $ }}
+              imagePullPolicy: {{ $.Values.image.pullPolicy | quote }}
+              {{- if $.Values.backup.cronjob.containerSecurityContext.enabled }}
+              securityContext: {{- omit $.Values.backup.cronjob.containerSecurityContext "enabled" | toYaml | nindent 16 }}
+              {{- end }}
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  export now=$(date +%Y-%m-%d_%Hh%Mm%Ssec)
+                  export database="{{ $database }}"
+                  /opt/mssql-tools/bin/sqlcmd -S {{ include "mssql.primary.fullname" $ }}.{{ include "common.names.namespace" $ }}.svc.{{ $.Values.clusterDomain }} \
+                    -U sa -P "$SA_PASSWORD" \
+                    -e -Q \
+                    {{ (include "common.tplvalues.render" ( dict "value" $.Values.backup.cronjob.commandTemplate "context" $ )) | quote }}
+
+                  if [ "$?" = "0" ];then
+                    echo "In the primary DB, restore this snapshot by running:"
+                    echo "# bash /tmp/entrypoint-scripts/restore.sh $database $now"
+                  fi
+
+              env:
+                - name: SA_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ template "mssql.secretName" $ }}
+                      key: mssql-root-password
+              {{- if $.Values.backup.cronjob.resources }}
+              resources: {{- toYaml $.Values.backup.cronjob.resources | nindent 16 }}
+              {{- end }}
+{{- end }}
+{{- end }}
