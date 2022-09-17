@@ -19,18 +19,19 @@ Hint:  It's almost identical to values schema of `bitnami/mysql` helm chart.
 
 # Features
 
-1. Applying Bitnami Helm Chart standards [ DONE ✅ ]
-   > Same interface (values.yaml schema ) as such bitnami/mysql helm chart values.
-   > Ability to specify own registry
-   > auto-generate passwords in not given
-   > and more...
-2. Persisting Data [ DONE ✅ ]
-3. Auto Bootstrapping Database 
-4. Auto Bootstraping Database Owner User with given password [ DONE ✅ ]
-5. Ability to execute initial DB scripts (SQL) [ DONE ✅ ]
-6. Performance Monitoring - Integrated with Prometheus Operator [ DONE ✅ ]
-7. Persistence for Backup [ TODO ]
+1. Applying Bitnami Helm Chart standards
+   - Same interface (values.yaml schema ) as such bitnami/mysql helm chart values.
+   - Ability to specify own registry
+   - auto-generate passwords in not given
+   - and more...
+2. Persisting Data
+3. Auto Bootstrapping Database
+4. Auto Bootstraping Database Owner User with given password
+5. Ability to execute initial DB scripts (SQL)
+6. Performance Monitoring - Integrated with Prometheus Operator
+7. Persistence for Backup
 8. Replication Architecture [ TODO ]
+9. TCP ingress for Database (traefik)
 
 # Backup/restore
 
@@ -41,7 +42,7 @@ Hint:  It's almost identical to values schema of `bitnami/mysql` helm chart.
 # Try Sample
 
 Try with [values.sample.yaml](values.sample.yaml)
-
+- Update `values.sample.yaml` as per your environment
 - `helm -n db upgrade db1 elm/mssql -f values.sample.yaml -i --create-namespace`
 - Connect to DB using MSSQL client as per guide available at `helm -n db get notes db1`
 - Validate in your grafana dashboard
@@ -49,7 +50,7 @@ Try with [values.sample.yaml](values.sample.yaml)
 
 **Take backup**
 - Connect to DB using MSSQL client as per guide available at `helm -n db get notes db1`
-- Add test data before backup: 
+- Add test data before backup:
 ```sh
 sqlcmd -S db1-mssql.db.svc.cluster.local -U sa -P "$SA_PASSWORD" -e -Q "USE DemoData
 INSERT INTO [dbo].[Products] ([ID],[ProductName]) VALUES (7,'Test backup restore')
@@ -60,7 +61,7 @@ GO
 ```sh
 sqlcmd -S db1-mssql.db.svc.cluster.local -U sa -P "$SA_PASSWORD" -e -Q "BACKUP DATABASE [DemoData] TO DISK = N'/var/opt/mssql/backup/DemoData-001.bak' WITH NOFORMAT, NOINIT, NAME = 'DemoDatabackup', SKIP, NOREWIND, NOUNLOAD, STATS = 10"
 ```
-- Delete database 
+- Delete database
 ```sh
 sqlcmd -S db1-mssql.db.svc.cluster.local -U sa -P "$SA_PASSWORD" -e -Q "USE master
 GO
@@ -73,7 +74,7 @@ GO
 
 
 **restore**
-1.  list out logical file names and paths inside the backup. 
+1.  list out logical file names and paths inside the backup.
 
 `sqlcmd -S db1-mssql.db.svc.cluster.local -U sa -P "$SA_PASSWORD" -e -Q 'RESTORE FILELISTONLY FROM DISK = "/var/opt/mssql/backup/DemoData-001.bak"' | tr -s ' ' | cut -d ' ' -f 1-2`
 
@@ -89,12 +90,13 @@ GO
 
 **1.4.0 (planned)**
 - Support Repliction architecture (publisher, subscriber, distributor)
-- 
-**1.3.0 (latest)**
+-
+**1.3.x (latest)**
 - Persisting Backups
 - Taking backups automatically for the specified databases at the specified time/period.
 - Providing restore CLI to restore EASILY backups taken automatically
 - Extensive docs in README with e2e example
+- Supporting TCP Ingress for Traefik-based ingress controllers.
 
 **1.2.1**
 - Ability to execute initial DB scripts (SQL) [ DONE ✅ ]
@@ -109,8 +111,8 @@ GO
 
 # Authors
 
-This chart is maintained by: 
-- @abdennour 
+This chart is maintained by:
+- @abdennour
 
 # License
 

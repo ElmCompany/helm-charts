@@ -1,0 +1,29 @@
+{{- if .Values.ingress.enabled }}
+{{- if and (eq .Values.ingress.className "traefik") .Values.ingress.host }}
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: {{ include "mssql.primary.fullname" . }}
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: primary
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.primary.service.annotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.primary.service.annotations "context" $ ) | nindent 4 }}
+    {{- end }}
+spec:
+  entryPoints:
+  - mssql
+  routes:
+  - match: HostSNI(`{{ .Values.ingress.host }}`)
+    services:
+    - name: {{ include "mssql.primary.fullname" . }}
+      port: {{ .Values.primary.service.ports.mssql }}
+{{- end }}
+{{- end }}

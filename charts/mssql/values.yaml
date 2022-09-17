@@ -136,10 +136,10 @@ auth:
   ## @param auth.replicationUser MSSQL replication user
   ## ref: https://github.com/bitnami/containers/tree/main/bitnami/mssql#setting-up-a-replication-cluster
   ##
-  ## @param auth.createLogin 
+  ## @param auth.createLogin
   ##      if Yes, the .Values.auth.username is a local user..
   ##      IF No, the .Values.auth.username is a domain user
-  ##      If .Values.auth.username not defined, .this param has no effect 
+  ##      If .Values.auth.username not defined, .this param has no effect
   ## ref: https://github.com/bitnami/containers/tree/main/bitnami/mssql#creating-a-database-user-on-first-run
   ##
   createLogin: true
@@ -167,6 +167,21 @@ initdbScripts: {}
 ## @param initdbScriptsConfigMap ConfigMap with the initdb scripts (Note: Overrides `initdbScripts`)
 ##
 initdbScriptsConfigMap: ""
+## @section MSSQL Ingress TCP
+ingress:
+  enabled: false
+  ## @param ingress.className
+  # traefik, ..etc
+  className: traefik
+  ## @param ingress.host
+  ## i.e. db1.company.lan
+  host:
+  ## @param ingress.traefikEntrypoint
+  ## In case ingress.className=traefik, this param is needed
+  ## ref: https://community.traefik.io/t/tcp-on-kubernetes/1528/21?u=abdennour
+  traefikEntrypoint: mssql
+
+
 
 ## @section MSSQL Primary parameters
 
@@ -951,12 +966,12 @@ backup:
     ## @param backup.cronjob.commandTemplate TODO backup command template to be run by "sqlcmd" every .Values.backup.schedule - TODO !!!
     ##   it is a template that can interpolate:
     ##      1. Any Values of this chart
-    ##      2. The following env vars: 
+    ##      2. The following env vars:
     ##          - $database : database as it was mentioned in .Values.backup.databases[i]
     ##          - $now: current time in this format %Y-%m-%d_%Hh%Mm%Ssec
-    ## 
+    ##
     ## !!!! NOTE !!!!
-    ## Recommended to not override this value as the restore script is 
+    ## Recommended to not override this value as the restore script is
     ##     developed based on this default value of @param backup.cronjob.commandTemplate.
     ## !!!!!!!!!!!!!!
     ## ref: https://learn.microsoft.com/en-us/sql/t-sql/statements/backup-transact-sql?view=sql-server-ver16
@@ -1006,7 +1021,7 @@ backup:
     ##
     tolerations: []
 
-  
+
   ## Persistence for Backup files
   ##
   persistence:

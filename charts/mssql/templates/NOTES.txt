@@ -12,19 +12,19 @@ To connect to your database:
 
   2. To connect to primary service (read/write):
 
-      sqlcmd -S {{ include "mssql.primary.fullname" . }}.{{ include "common.names.namespace" . }}.svc.{{ .Values.clusterDomain }} -U sa -P "$SA_PASSWORD" 
+      sqlcmd -S {{ include "mssql.primary.fullname" . }}.{{ include "common.names.namespace" . }}.svc.{{ .Values.clusterDomain }} -U sa -P "$SA_PASSWORD"
 
 {{- if eq .Values.architecture "replication" }}
 
   3. To connect to secondary service (read-only):
 
-      sqlcmd -S {{ include "mssql.secondary.fullname" . }}.{{ include "common.names.namespace" . }}.svc.{{ .Values.clusterDomain }} -U sa -P "$SA_PASSWORD" 
+      sqlcmd -S {{ include "mssql.secondary.fullname" . }}.{{ include "common.names.namespace" . }}.svc.{{ .Values.clusterDomain }} -U sa -P "$SA_PASSWORD"
 
 
 {{- end }}
 {{- if .Values.backup.enabled }}
 
-   4. To take a backup (.i.e. boostrapped DB {{ .Values.auth.database }} initiated by the helm release): 
+   4. To take a backup (.i.e. boostrapped DB {{ .Values.auth.database }} initiated by the helm release):
 
         sqlcmd \
           -S {{ include "mssql.primary.fullname" . }}.{{ include "common.names.namespace" . }}.svc.{{ .Values.clusterDomain }} \
@@ -41,7 +41,7 @@ To execute SQL from string, use command above & append [ -e -Q "select name from
 
 
 To Run your queries after connecting to your database:
-   
+
 
   0. Check version
 
@@ -50,13 +50,13 @@ To Run your queries after connecting to your database:
    go
    ```
 
-   1. List databases 
+   1. List databases
    ```sql
     select name from sys.databases
     go
    ```
 
-   2. Check collation 
+   2. Check collation
    ```sql
    SELECT SERVERPROPERTY('COLLATION')
    ```
@@ -68,7 +68,7 @@ To Run your queries after connecting to your database:
    go
    ```
 
-   4. List data of table 
+   4. List data of table
 
    ```sql
    USE YOUR_DATABASE_NAME
@@ -77,12 +77,60 @@ To Run your queries after connecting to your database:
    GO
 
    ```
+
+#### INGRESS #################################################################
+{{- if and .Values.ingress. (eq .Values.ingress.className "traefik") }}
+Apply a similar patch as above, if {{ .Values.primary.service.ports.mssql }} port is still not exposed with Traefik
+```
+cat > /tmp/patch-traefik.yaml <<EOF
+spec:
+  valuesContent: |-
+    rbac:
+      enabled: true
+    ports:
+      web:
+        redirectTo: websecure
+      websecure:
+        tls:
+          enabled: true
+      {{ .Values.ingress.traefikEntrypoint }}:
+        port: {{ .Values.primary.service.ports.mssql }}
+        protocol: TCP
+        expose: true
+    podAnnotations:
+      prometheus.io/port: "8082"
+      prometheus.io/scrape: "true"
+    providers:
+      kubernetesIngress:
+        publishedService:
+          enabled: true
+    priorityClassName: "system-cluster-critical"
+    image:
+      name: "rancher/mirrored-library-traefik"
+      tag: "2.6.2"
+    tolerations:
+    - key: "CriticalAddonsOnly"
+      operator: "Exists"
+    - key: "node-role.kubernetes.io/control-plane"
+      operator: "Exists"
+      effect: "NoSchedule"
+    - key: "node-role.kubernetes.io/master"
+      operator: "Exists"
+      effect: "NoSchedule"
+    service:
+      ipFamilyPolicy: "PreferDualStack"
+EOF
+
+kubectl -n kube-system patch helmchart traefik --type merge --patch-file /tmp/patch-traefik.yaml
+```
+{{- end }}
+
 {{- if not .Values.backup.persistence.enabled }}
 #################################################################################
 ######   WARNING: Persistence is disabled for BACKUPs !!!                    #####
 ######  !!! You will lose your  backups when                                #####
 ######            the primary pod is terminated.                            #####
-########   Check @param backup.persistence.enabled to metigate this      ######## 
+########   Check @param backup.persistence.enabled to metigate this      ########
 #################################################################################
 {{- end }}
 
@@ -90,9 +138,9 @@ To Run your queries after connecting to your database:
 #################################################################################
 #######################        DISCLAIMER        ################################
 #################################################################################
-BY DEPLOYING THIS HELM CHART, YOU ARE ACCEPTING THE END-USER Licensing Agreement 
+BY DEPLOYING THIS HELM CHART, YOU ARE ACCEPTING THE END-USER Licensing Agreement
   of Microsoft SQL Server:
      https://go.microsoft.com/fwlink/?LinkId=746388
-IF YOU ARE NOT ACCEPTING THAT LICENSE, YOU MUST DELETE THIS RELEASE IMMEDIATELY: 
+IF YOU ARE NOT ACCEPTING THAT LICENSE, YOU MUST DELETE THIS RELEASE IMMEDIATELY:
     # helm -n {{ .Release.Namespace }} delete {{ .Release.Name }}
 #################################################################################
