@@ -79,7 +79,7 @@ To Run your queries after connecting to your database:
    ```
 
 #### INGRESS #################################################################
-{{- if and .Values.ingress. (eq .Values.ingress.className "traefik") }}
+{{- if and .Values.ingress.enabled (eq .Values.ingress.className "traefik") }}
 Apply a similar patch as above, if {{ .Values.primary.service.ports.mssql }} port is still not exposed with Traefik
 ```
 cat > /tmp/patch-traefik.yaml <<EOF
