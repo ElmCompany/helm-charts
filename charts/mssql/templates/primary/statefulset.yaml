@@ -318,6 +318,10 @@ spec:
         - name: backup
           persistentVolumeClaim:
             claimName: {{ tpl .Values.backup.persistence.existingClaim . }}
+  {{- else if and .Values.backup.persistence.enabled (not .Values.backup.persistence.existingClaim)}}
+        - name: backup
+          persistentVolumeClaim:
+            claimName: {{ printf "backups-%s" (include "mssql.primary.fullname" .) }}
   {{- else if not .Values.backup.persistence.enabled }}
         - name: backup
           emptyDir: {}
@@ -351,33 +355,5 @@ spec:
         {{- include "common.storage.class" (dict "persistence" .Values.primary.persistence "global" .Values.global) | nindent 8 }}
         {{- if .Values.primary.persistence.selector }}
         selector: {{- include "common.tplvalues.render" (dict "value" .Values.primary.persistence.selector "context" $) | nindent 10 }}
-        {{- end -}}
-  {{- end }}
-  {{- if and .Values.backup.persistence.enabled (not .Values.backup.persistence.existingClaim) }}
-    - metadata:
-        name: backup
-        labels: {{ include "common.labels.matchLabels" . | nindent 10 }}
-          app.kubernetes.io/component: primary
-          {{- if .Values.commonLabels }}
-          {{- include "common.tplvalues.render" (dict "value" .Values.commonLabels "context" $) | nindent 10 }}
-          {{- end }}
-        annotations:
-          {{- if .Values.backup.persistence.annotations }}
-          {{- include "common.tplvalues.render" (dict "value" .Values.backup.persistence.annotations "context" $) | nindent 10 }}
-          {{- end }}
-          {{- if .Values.commonAnnotations }}
-          {{- include "common.tplvalues.render" (dict "value" .Values.commonAnnotations "context" $) | nindent 10 }}
-          {{- end }}
-      spec:
-        accessModes:
-          {{- range .Values.backup.persistence.accessModes }}
-          - {{ . | quote }}
-          {{- end }}
-        resources:
-          requests:
-            storage: {{ .Values.backup.persistence.size | quote }}
-        {{- include "common.storage.class" (dict "persistence" .Values.backup.persistence "global" .Values.global) | nindent 8 }}
-        {{- if .Values.backup.persistence.selector }}
-        selector: {{- include "common.tplvalues.render" (dict "value" .Values.backup.persistence.selector "context" $) | nindent 10 }}
         {{- end -}}
   {{- end }}
