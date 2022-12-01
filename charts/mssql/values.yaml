@@ -306,16 +306,12 @@ primary:
   ## @param primary.resources.requests The requested resources for MSSQL primary containers
   ##
   resources:
-    ## Example:
-    ## limits:
-    ##    cpu: 250m
-    ##    memory: 256Mi
-    limits: {}
-    ## Examples:
-    ## requests:
-    ##    cpu: 250m
-    ##    memory: 256Mi
-    requests: {}
+    requests:
+      memory: "2G"
+      cpu: "2000m"
+    limits:
+      memory: "2G"
+      cpu: "2000m"
   ## Configure extra options for liveness probe
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
   ## @param primary.livenessProbe.enabled Enable livenessProbe
@@ -1049,7 +1045,7 @@ backup:
     ## @param backup.persistence.accessModes Backup MSSQL primary persistent volume access Modes
     ##
     accessModes:
-      - ReadWriteOnce
+      - ReadWriteMany
     ## @param backup.persistence.size Backup MSSQL primary persistent volume size
     ##
     size: 20Gi

@@ -1,0 +1,30 @@
+{{- if and .Values.backup.persistence.enabled (not .Values.backup.persistence.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ printf "backups-%s" (include "mssql.primary.fullname" .) }}
+  labels: {{ include "common.labels.matchLabels" . | nindent 4 }}
+    app.kubernetes.io/component: primary
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.commonLabels "context" $) | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if .Values.backup.persistence.annotations }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.backup.persistence.annotations "context" $) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.commonAnnotations "context" $) | nindent 4 }}
+    {{- end }}
+spec:
+  accessModes:
+    {{- range .Values.backup.persistence.accessModes }}
+    - {{ . | quote }}
+    {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.backup.persistence.size | quote }}
+  {{- include "common.storage.class" (dict "persistence" .Values.backup.persistence "global" .Values.global) | nindent 2 }}
+  {{- if .Values.backup.persistence.selector }}
+  selector: {{- include "common.tplvalues.render" (dict "value" .Values.backup.persistence.selector "context" $) | nindent 4 }}
+  {{- end -}}
+  {{- end }}
