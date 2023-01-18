@@ -2,9 +2,7 @@ apiVersion: v2
 name: docker-daemon-sshd
 description: |
   Deploy Remote Docker Daemon exposed thru SSH.
-  Architecture details: https://do.elm.sa/aa0o9
 
-icon: https://themes.devops.elm.sa/icons/docker-daemon-sshd.png
 keywords:
   - docker
   - dind
