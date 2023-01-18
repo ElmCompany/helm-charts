@@ -129,9 +129,7 @@ sshClient:
   ### .Values.sshClient.extraKnownHosts
   ## i.e.
   # extraKnownHosts:
-  #   - 10.33.44.39
-  #   - vm-abdennour.guacamole
-  #   - pe1-cdx-rv-gs05.docker
+  #   - 
   extraKnownHosts: []
   podExample:
     enabled: true
