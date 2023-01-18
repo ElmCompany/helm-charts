@@ -102,13 +102,6 @@ dockerClient:
       memory: '64Mi'
   ### .Values.dockerClient.extraDockerContextes
   ## .i.e
-  # extraDockerContextes:
-  #   - name: pe1-cdx-rv-gs05
-  #     endpoint: ssh://docker@pe1-cdx-rv-gs05.docker
-  #   - name: ci
-  #     endpoint: ssh://ci@192.168.71.43
-  #   - name: spare
-  #     endpoint: tcp://172.55.81.32:2375
   extraDockerContextes: []
 ## .Values.imagePullSecrets
 ## example:
@@ -161,35 +154,9 @@ sshClient:
     #   cpu: 100m
     #   memory: 128Mi
 sshKeys:
-  public: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDHcAwSxJK+3P+4+Fa7dXsWK1G8h3gg1hqGSgykuPVqxyw5irEhHpKigVU02pDbQv7j7ExB2sPLQxZerZmhPUeLoJfNmMM28jNQ4vNn/CmtbmdvXLui9jt0n9R+YU4YhGDxHzseSYngRs+MTHZlpajVL3BIBy5+ZZBzktqRYUmTWMQnE1xqZlMgLhPy7DuOfnxw2tPa6zkyAGWV8Ec4H9axoATkoxl65Yggo2lvanxoOdG5/Vwzy7P4z3YGd13UPwEo/mY9nhYQ7yzVVjcUOmpZjIg511Ea4JHs5MtgW3x6FMFf47aXrOu0xm3zztRQR0xdiC5j4w1Ri2+8q+bZIe7l fd@N11336
-  private: |
-    -----BEGIN RSA PRIVATE KEY-----
-    MIIEpQIBAAKCAQEAx3AMEsSSvtz/uPhWu3V7FitRvId4INYahkoMpLj1ascsOYqx
-    IR6SooFVNNqQ20L+4+xMQdrDy0MWXq2ZoT1Hi6CXzZjDNvIzUOLzZ/wprW5nb1y7
-    ovY7dJ/UfmFOGIRg8R87HkmJ4EbPjEx2ZaWo1S9wSAcufmWQc5LakWFJk1jEJxNc
-    amZTIC4T8uw7jn58cNrT2us5MgBllfBHOB/WsaAE5KMZeuWIIKNpb2p8aDnRuf1c
-    M8uz+M92Bndd1D8BKP5mPZ4WEO8s1VY3FDpqWYyIOddRGuCR7OTLYFt8ehTBX+O2
-    l6zrtMZt887UUEdMXYguY+MNUYtvvKvm2SHu5QIDAQABAoIBAQCAD6CRBIw95maF
-    /WCj6mHo8FQBvPMUEqbhh/bqZqGfuNja8gWfAKSjmGyADcBqKnDFJdwphTGn+SIK
-    FWrKsDCapboUGH1xcMAmtjQZlz+jz3q3dVI+5+Fxl5e4tv6Qm6Ar9CPf5NSVoKJw
-    skBsMJ1ilp2AgqwGGW1R6QBTzaaS547GS0yIynuvnXtMQJODSFh082+b0lrhjjNS
-    lmL4yCiVHRmFsTnFKcd4gbpQsGyMyGFkZ48SLfIlLmIw6lTv1oO7WY5DQ8KcRA/0
-    d+xlwWQXFpO00I1DB3p4ZSm33bGjoOcx2cCB8Xlq2dXwy/QIwXf/AEoLyIOuyS8f
-    lLRjF8BZAoGBAPxo5owUVvE1XVHdQY04MoM8Sog2SzcyPEqNQdh+bJW2xL0fhKYr
-    1vmcBj68VVBHjUucYNfoXY27GP/iWm261LAfvHZPg57Yiz8+SSH9rRPHtiyGGA1k
-    zLQpg+s4J90mQVQRQrPFxObU30XQkHAf7+uryuEn9kwnDqM8s8hmHl+DAoGBAMpG
-    Qmeav0k6+ZJqwvR9xDgAhvjtEN/MiZ1lQn32k1tG0LpZ8y0547a9TbaNsJtcUlrx
-    gFFH+xxthlVw8VVQLllxtpT6lhev4ClAnpQ1POSKTVTt0Tv5ywbyxSDzY7VRHAI2
-    CMRCsSOLgcdiUQ/uEnwzTRgEMqS5dBBM5PTgdwN3AoGBAIcyLOK09kime8CgkT7x
-    7eRrQ8SnyCvdZXvNI4qxVLnwNnrSSfuzmacDEjlCKTQhzyXDsf+Tf6CtqVtNw3/o
-    xYk8xnZcarSHajZKx2NEfBMPMp2wiWuLJTYO0pEH+Bo1JmLACAlAkhHNzXWYm/Ti
-    tmB2GOn2vK7XcLiwh998CyK/AoGAUscV/dgyWAGuiODwD6Y4WsK8ebpqoWvPFX6P
-    C4WRIFWGrfyJrAR40BwAZajukWXivhz+6kSO2z9nLigeW0+I6EnE8orqSZ9MGRW8
-    z+JJnS2MICmC6wx6rclEKwvvzg/3amA6jjbMz0MURUhS7DX9kp5b+mwdXZQXj2Qo
-    fp4tllkCgYEA8sbqc+c5EXQ8SIYq5TMKo/5sBQIXqMPM2NPfIaMCmQeFAh4K2MJC
-    3H06VwaiK/NNPJDqcIpQ+Yuin9/Mrfku5FQ4jXTYYuvXzSG+FTs6Tux5RVCcDBIj
-    DCCmKxQdgOOjZvCuU/Y1pFbByozFZYPv9XWq8zSZnTmjcamqM8n3vcs=
-    -----END RSA PRIVATE KEY-----
+  public:
+  private:
+
 nameOverride: ""
 fullnameOverride: ""
 
