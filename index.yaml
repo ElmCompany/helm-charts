@@ -3,6 +3,30 @@ entries:
   docker-daemon-sshd:
   - apiVersion: v2
     appVersion: 20.10.9
+    created: "2023-06-10T19:13:10.954711052Z"
+    description: 'Deploy Remote Docker Daemon exposed thru SSH. '
+    digest: b716409c5435cdaec3611cdb860ed5340cf14b232ab3331b07ba6c64366f766b
+    keywords:
+    - docker
+    - dind
+    - dockerindocker
+    - daemon
+    - sshd
+    - dockercontext
+    - ci
+    - desktop
+    - dockerdaemon
+    - dockercontextssh
+    maintainers:
+    - email: github@abdennoor.com
+      name: abdennour
+    name: docker-daemon-sshd
+    type: application
+    urls:
+    - https://github.com/ElmCompany/helm-charts/releases/download/docker-daemon-sshd-1.0.9-deprecated/docker-daemon-sshd-1.0.9-deprecated.tgz
+    version: 1.0.9-deprecated
+  - apiVersion: v2
+    appVersion: 20.10.9
     created: "2022-09-16T18:15:22.550222062Z"
     description: 'Deploy Remote Docker Daemon exposed thru SSH. Architecture details:
       https://do.elm.sa/aa0o9 '
@@ -360,6 +384,32 @@ entries:
     urls:
     - https://github.com/ElmCompany/helm-charts/releases/download/mssql-1.2.1/mssql-1.2.1.tgz
     version: 1.2.1
+  prometheus-to-teams:
+  - apiVersion: v1
+    appVersion: 4.2.0
+    created: "2023-06-10T19:13:11.107758338Z"
+    description: 'A Helm chart to Send Alerts to MS Teams '
+    digest: fcf41d504334467a10a2ddd0a19fa30edb00c24e056f54ed469c82500f94565e
+    icon: https://raw.githubusercontent.com/ElmCompany/helm-charts/master/assets/icons/prometheus-msteams.png
+    keywords:
+    - prometheus
+    - alertmanager
+    - msteams
+    - notification
+    - observability
+    - microsoft
+    - cloudnative
+    - kubernetes
+    - openshift
+    maintainers:
+    - name: abdennour
+    name: prometheus-to-teams
+    sources:
+    - https://github.com/idealista/prom2teams.git
+    type: application
+    urls:
+    - https://github.com/ElmCompany/helm-charts/releases/download/prometheus-to-teams-0.1.0/prometheus-to-teams-0.1.0.tgz
+    version: 0.1.0
   radius-server:
   - apiVersion: v2
     appVersion: 2.2.9
@@ -457,4 +507,4 @@ entries:
     urls:
     - https://github.com/ElmCompany/helm-charts/releases/download/webapp-1.2.0/webapp-1.2.0.tgz
     version: 1.2.0
-generated: "2022-12-01T06:33:09.356350161Z"
+generated: "2023-06-10T19:13:11.107845739Z"
