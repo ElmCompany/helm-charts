@@ -1,0 +1,23 @@
+fullnameOverride: prom2teams
+image:
+  registry: my-private.registry.lan
+prom2teams:
+  extraEnv:
+    HTTP_PROXY: my.proxy.lan:8080
+  connectors:
+    ###############################################
+    ### Alertmanager Config for connector "general"
+    ###############################################
+    # - name: MSTeams
+    #   webhook_configs:
+    #     - url: "http://prom2teams:8089/v2/general"
+    #       send_resolved: true
+    general: https://alelmsa.webhook.office.com/webhookb2/xxxx-xxxx-xxx-xxx@xxxxxxxx-xxxx-xxxx-xxxxxxx/IncomingWebhook/xxxx/xx
+    ###############################################
+    ### Alertmanager Config for connector "prod"
+    ###############################################    
+    # - name: MSTeams
+    #   webhook_configs:
+    #     - url: "http://prom2teams:8089/v2/prod"
+    #       send_resolved: true
+    prod: https://alelmsa.webhook.office.com/webhookb2/yyyy-yyyy-yyy-yyy@yyyyyyyy-yyyy-yyyy-yyyyyyy/IncomingWebhook/yyyy/yy

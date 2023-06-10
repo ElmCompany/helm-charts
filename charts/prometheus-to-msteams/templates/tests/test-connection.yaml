@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "prometheus-to-msteams.fullname" . }}-test-connection"
+  labels:
+{{ include "prometheus-to-msteams.labels" . | indent 4 }}
+  annotations:
+    "helm.sh/hook": test-success
+    "helm.sh/hook-delete-policy": test-success,test-failure
+spec:
+  containers:
+    - name: wget
+      image: '{{.Values.image.registry}}/busybox'
+      command: ['wget']
+      args:  ['{{ include "prometheus-to-msteams.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never
