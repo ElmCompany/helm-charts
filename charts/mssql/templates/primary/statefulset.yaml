@@ -297,11 +297,9 @@ spec:
             name: {{ include "mssql.primary.configmapName" . }}
         {{- end }}
         {{- if or .Values.initdbScriptsConfigMap .Values.initdbScripts }}
-        - name: custom-init-scripts-configmap
+        - name: custom-init-scripts-dir
           configMap:
             name: {{ include "mssql.initdbScriptsCM" . }}
-        - name: custom-init-scripts-dir
-          emptyDir: {}
         {{- end }}
         {{- if .Values.primary.extraVolumes }}
         {{- include "common.tplvalues.render" (dict "value" .Values.primary.extraVolumes "context" $) | nindent 8 }}
