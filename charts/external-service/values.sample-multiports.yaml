@@ -1,0 +1,33 @@
+fullnameOverride: git
+externalService:
+  ports:
+  - name: http
+    port: 8080
+    protocol: TCP
+  - name: ssh
+    port: 7090
+    protocol: TCP
+  ips:
+  - 172.16.x.x
+service:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+    protocol: TCP
+  - name: ssh
+    port: 22
+    targetPort: ssh
+    protocol: TCP
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /scm/$1
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: git.mycompany.com
+      paths:
+      - /(.*)

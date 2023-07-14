@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "external-service.fullname" . }}-test-connection"
+  labels:
+    {{- include "external-service.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  containers:
+    - name: wget
+      image: busybox
+    {{- if .Values.service.port }}
+      command: ['wget']
+      args: ['{{ include "external-service.fullname" . }}:{{ .Values.service.port }}']
+    {{- else }}
+      command: ["echo"]
+      args: ["No test available for multi ports"]
+    {{- end }}  
+  restartPolicy: Never

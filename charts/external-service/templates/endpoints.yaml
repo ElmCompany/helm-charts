@@ -1,0 +1,22 @@
+---
+kind: Endpoints
+apiVersion: v1
+metadata:
+  name: {{ include "external-service.fullname" . }}
+  labels:
+    {{- include "external-service.labels" . | nindent 4 }}
+subsets:
+ - addresses:
+    {{- if .Values.externalService.ip  }}
+    - ip: {{ .Values.externalService.ip  }}
+    {{- end }}
+    {{- range .Values.externalService.ips }}
+    - ip: {{ . }}
+    {{- end }}
+   ports:
+    {{- if .Values.externalService.port  }}
+    - port: {{ .Values.externalService.port  }}
+    {{- end }}
+    {{- with .Values.externalService.ports }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}

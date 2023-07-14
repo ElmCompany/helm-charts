@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "external-service.fullname" . }}
+  labels:
+    {{- include "external-service.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  {{- if .Values.service.port }}
+  - port: {{ .Values.service.port }}
+    targetPort: {{ .Values.externalService.port }}
+  {{- end }}
+  {{- if .Values.service.ports }}
+  {{- with .Values.service.ports }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- end }}
+
+
+# kind: Service
+# apiVersion: v1
+# metadata:
+#  name: nexus
+# spec:
+#  ports:
+#  - port: 80
+#    targetPort: 80
