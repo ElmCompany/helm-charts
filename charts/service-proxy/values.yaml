@@ -1,0 +1,158 @@
+# Default values for service-proxy.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+openshift: true
+### @Section Networking #####
+
+# Of one: https-passthrough | http-https | s3
+proxyMode: https-passthrough
+backendService:
+  address:
+  port: 443
+  caCert: ""
+  caCertConfigmap:
+    name: ""
+    key: service-ca.crt
+
+proxyPorts:
+  webPort: 8080
+  adminPort: 8888
+service:
+  type: ClusterIP
+  port: 80
+  adminPort: 8888
+
+envVars: {}
+# @parm envVarsSealed env vars with sealed values
+#  seal -h https://seal.apps.mycluster.com -n [namespace] -s [ClearValue]
+#
+envVarsSealed: {}
+# @param sealScope scope of secrets sealing in envVarsSealed
+sealScope: namespace-wide
+
+route:
+  enabled: false
+  ## domain: wildcardomain.com
+  ## if you specify domain, the chart will automatically calculate
+  ## the subdomain , then the full hostname will be subdomain.domain
+  domain: ''
+  ## specify the exact hostname as you want
+  ## without delegating it to the automation
+  host: ''
+  extraHosts: []
+  ## .Values.route.secure
+  ## To enable tls for host, set secure: true
+  secure: true
+  ## To enable tls for extraHosts, set secureExtraHosts: true
+  secureExtraHosts: true
+  ## .Values.route.termination
+  ## if it's secure, you can choose the termination
+  termination: edge
+  ## .Values.route.annotations
+  # annotations:
+  #   nginx.ingress.kubernetes.io/rewrite-target: /scm/$1
+  annotations: {}
+  ## .Values.route.path
+  # path: /(.*) # useful when rewrite-target used
+  path: /
+adminRoute:
+  enabled: false
+  ## domain: wildcarddomain.com
+  ## if you specify domain, the chart will automatically calculate
+  ## the subdomain , then the full hostname will be subdomain.domain
+  domain: ''
+  ## specify the exact hostname as you want
+  ## without delegating it to the automation
+  host: ''
+  extraHosts: []
+  ## .Values.route.secure
+  ## To enable tls for host, set secure: true
+  secure: true
+  ## To enable tls for extraHosts, set secureExtraHosts: true
+  secureExtraHosts: true
+  ## .Values.route.termination
+  ## if it's secure, you can choose the termination
+  termination: edge
+  ## .Values.route.annotations
+  # annotations:
+  #   nginx.ingress.kubernetes.io/rewrite-target: /scm/$1
+  annotations: {}
+  ## .Values.route.path
+  # path: /(.*) # useful when rewrite-target used
+  path: /
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+### @Section Workload ########
+replicaCount: 1
+image:
+  registry: docker.io
+  repository: envoyproxy/envoy
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

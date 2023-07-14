@@ -1,0 +1,16 @@
+{{ if .Values.backendService.caCert }}
+---
+apiVersion: v1
+data:
+kind: ConfigMap
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: {{ include "service-proxy.backendServiceCaCertConfigmapName" . }}
+  labels:
+    {{- include "service-proxy.labels" . | nindent 4 }}
+
+data:
+  {{ .Values.backendService.caCertConfigmap.key }}: |
+    {{ .Values.backendService.caCert | nindent 4 }}
+
+{{ end }}

@@ -1,0 +1,6 @@
+proxyMode: http-https
+backendService:
+  address: prometheus-k8s.openshift-monitoring.svc.cluster.local
+  port: 9091
+  caCertConfigmap:
+    name: corporate-ca

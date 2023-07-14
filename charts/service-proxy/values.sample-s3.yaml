@@ -1,0 +1,22 @@
+## Deploy: helm -n test template ntnx-s3 service-proxy -f examples/proxy-s3.yaml | oc -n test  apply -f-
+## Validate: oc -n test run aws-cli --rm --tty -i --restart='Never' --image docker.io/amazon/aws-cli:2.8.12 --command /bin/sh -- -c /bin/sh
+## Validate1:  (interactive shell of previous): curl http://proxy-minio-s3
+## Validate2: (interactive shell of previous): aws --endpoint http://proxy-minio-s3 s3 ls --profile xx --no-sign-request
+## Validate3: (//) : aws --endpoint http://proxy-minio-s3 s3api list-objects --bucket mybucket-name --profile xx --no-sign-request
+# https-passthrough | http-https
+proxyMode: s3
+fullnameOverride: proxy-minio-s3
+backendService:
+  address: minio.mycompany.com
+  port: 443
+route:
+  enabled: true
+  host: s3.apps.mycluster.com
+envVars:
+  AWS_DEFAULT_REGION: us-east-1
+
+envVarsSealed:
+  # Sealed with Bitnami SealedSecret
+  AWS_ACCESS_KEY_ID: AgCU...
+  # Sealed with Bitnami SealedSecret
+  AWS_SECRET_ACCESS_KEY: AgAt...
