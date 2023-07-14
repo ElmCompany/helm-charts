@@ -1,0 +1,12 @@
+# Proxy google.com & expose it in your cluster under goo.apps.mycluster.com
+# https-passthrough | http-https
+proxyMode: http-https
+backendService:
+  address: google.com
+  port: 443
+route:
+  enabled: true
+  host: goo.apps.mycluster.com
+adminRoute:
+  enabled: true
+  host: goo-envoy-status.apps.mycluster.com

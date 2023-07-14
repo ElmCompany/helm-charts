@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "service-proxy.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "service-proxy.labels" . | nindent 4 }}
+spec:
+  endpoints:
+  - interval: 10s
+    path: /stats/prometheus
+    port: admin
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "service-proxy.selectorLabels" . | nindent 6 }}

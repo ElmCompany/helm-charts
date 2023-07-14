@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "service-proxy.fullname" . }}
+  labels:
+    {{- include "service-proxy.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "service-proxy.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/configfile: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "service-proxy.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "service-proxy.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/usr/local/bin/envoy", "-c /tmp/etc/envoy.yaml"]
+          volumeMounts:
+            - name: config
+              mountPath: /tmp/etc
+           {{- if (include "service-proxy.backendServiceHasCaCert" .) }}
+            - name: backend-ca
+              mountPath: /tmp/certs
+           {{- end }}
+          ports:
+            - name: web
+              containerPort: {{ .Values.proxyPorts.webPort }}
+              protocol: TCP
+            - name: admin
+              containerPort: {{ .Values.proxyPorts.adminPort }}
+              protocol: TCP
+          {{- if or .Values.envVars .Values.envVarsSealed .Values.envFrom }}
+          envFrom:
+          {{- end }}
+          {{- with .Values.envVars }}
+            - secretRef:
+                name: {{ include "service-proxy.fullname" $ }}-env-vars
+          {{- end }}
+          {{- with .Values.envVarsSealed }}
+            - secretRef:
+                name: {{ include "service-proxy.fullname" $ }}-env-vars-sealed
+          {{- end }}
+          {{- with .Values.envFrom }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: admin
+          readinessProbe:
+            httpGet:
+              path: /
+              port: admin
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "service-proxy.fullname" . }}
+            defaultMode: 0644
+            items:
+              - key: envoy-{{ .Values.proxyMode }}.yaml
+                path: envoy.yaml
+        {{- if (include "service-proxy.backendServiceHasCaCert" .) }}
+        - name: backend-ca
+          configMap:
+            name: {{ include "service-proxy.backendServiceCaCertConfigmapName" .}}
+            defaultMode: 0644
+            items:
+              - key: {{ .Values.backendService.caCertConfigmap.key }}
+                path: backend-ca.crt
+        {{- end }}

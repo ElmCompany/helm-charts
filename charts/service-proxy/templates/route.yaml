@@ -1,0 +1,37 @@
+{{- if and .Values.openshift .Values.route.enabled -}}
+{{- range $index,$host := ( splitList "@" (include "service-proxy.hosts" . )) }}
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  {{- if eq $index 0 }}
+  name: {{ include "service-proxy.fullname" $ }}
+  {{- else }}
+  name: {{ include "service-proxy.fullname" $ }}-extra{{ $index }}
+  {{- end }}
+  {{- with $.Values.route.annotations }}
+  namespace: {{ $.Release.Namespace }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "service-proxy.labels" $ | nindent 4 }}
+spec:
+  host: {{ $host }}
+  {{- if and (eq $index 0) $.Values.route.secure }}
+  tls:
+    termination: {{ $.Values.route.termination }}
+  {{- end }}
+  {{- if and (not (eq $index 0)) ($.Values.route.secureExtraHosts) }}
+  tls:
+    termination: {{ $.Values.route.termination }}
+  {{- end }}
+  port:
+    targetPort: web
+  to:
+    kind: Service
+    name: {{ include "service-proxy.fullname" $ }}
+    weight: 100
+  wildcardPolicy: None
+{{- end }}
+{{- end }}
