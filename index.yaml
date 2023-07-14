@@ -204,6 +204,18 @@ entries:
     urls:
     - https://github.com/ElmCompany/helm-charts/releases/download/docker-daemon-sshd-1.0.1/docker-daemon-sshd-1.0.1.tgz
     version: 1.0.1
+  external-service:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2023-07-14T16:54:43.313564647Z"
+    description: 'Server an External service leveraging the wildcard domains Also
+      it help as intermediate step towards a full migration to cluster '
+    digest: c2ae21c16c07f9ffaa0e17ff7a6a77b0db77160329523d07893de20f9a125009
+    name: external-service
+    type: application
+    urls:
+    - https://github.com/ElmCompany/helm-charts/releases/download/external-service-0.2.0/external-service-0.2.0.tgz
+    version: 0.2.0
   mssql:
   - annotations:
       category: Database
@@ -590,4 +602,4 @@ entries:
     urls:
     - https://github.com/ElmCompany/helm-charts/releases/download/webapp-1.2.0/webapp-1.2.0.tgz
     version: 1.2.0
-generated: "2023-07-14T08:20:23.006402051Z"
+generated: "2023-07-14T16:54:43.313601547Z"
