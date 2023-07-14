@@ -496,6 +496,17 @@ entries:
     urls:
     - https://github.com/ElmCompany/helm-charts/releases/download/radius-server-1.0.0/radius-server-1.0.0.tgz
     version: 1.0.0
+  service-proxy:
+  - apiVersion: v2
+    appVersion: v1.25-latest
+    created: "2023-07-14T08:20:23.006121249Z"
+    description: A Helm chart for Deployed Envoy Proxy with Less Configuration effort
+    digest: da770f6f7245a4570e8a537b982abd47eab8dfd500760c31b892e3411acda432
+    name: service-proxy
+    type: application
+    urls:
+    - https://github.com/ElmCompany/helm-charts/releases/download/service-proxy-0.2.0/service-proxy-0.2.0.tgz
+    version: 0.2.0
   single-page-app:
   - apiVersion: v2
     appVersion: latest
@@ -579,4 +590,4 @@ entries:
     urls:
     - https://github.com/ElmCompany/helm-charts/releases/download/webapp-1.2.0/webapp-1.2.0.tgz
     version: 1.2.0
-generated: "2023-07-06T00:57:18.621888972Z"
+generated: "2023-07-14T08:20:23.006402051Z"
