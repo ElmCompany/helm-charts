@@ -207,6 +207,17 @@ entries:
   external-service:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2023-07-14T17:07:42.268338026Z"
+    description: 'Server an External service leveraging the wildcard domains Also
+      it help as intermediate step towards a full migration to cluster '
+    digest: 97e0100aeb6521636db87efebf11fa731fbef5650dfa8ff64025430ea33e4805
+    name: external-service
+    type: application
+    urls:
+    - https://github.com/ElmCompany/helm-charts/releases/download/external-service-0.3.0/external-service-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2023-07-14T16:54:43.313564647Z"
     description: 'Server an External service leveraging the wildcard domains Also
       it help as intermediate step towards a full migration to cluster '
@@ -602,4 +613,4 @@ entries:
     urls:
     - https://github.com/ElmCompany/helm-charts/releases/download/webapp-1.2.0/webapp-1.2.0.tgz
     version: 1.2.0
-generated: "2023-07-14T16:54:43.313601547Z"
+generated: "2023-07-14T17:07:42.268678329Z"
