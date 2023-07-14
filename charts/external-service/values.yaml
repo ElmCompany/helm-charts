@@ -1,0 +1,44 @@
+# Default values for external-service.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+### Define port or ports
+### Define ip or ips
+externalService:
+  ip:
+  port: # 80
+  # ports:
+  # - port: 1812
+  #   protocol: UDP
+  # - port: 1813
+  #   protocol: UDP
+  ports: []
+  # ips:
+  # - 192.168.44.35
+  # - 192.168.33.77
+  ips: []
+service:
+  type: ClusterIP
+  port: # 80
+
+  # ports:
+  # - port: 1812
+  #   targetPort: 1812
+  #   protocol: UDP
+  # - port: 1813
+  #   targetPort: 1813
+  #   protocol: UDP 
+  ports: []
+ingress:
+  enabled: false
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths: []
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+nameOverride: ""
+fullnameOverride: ""

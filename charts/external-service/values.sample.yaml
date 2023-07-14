@@ -1,0 +1,24 @@
+externalService:
+  ports:
+  - name: http
+    port: 8081
+    protocol: TCP
+  ips:
+  - 172.16.x.x
+service:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 8081
+    targetPort: http
+    protocol: TCP
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/service-upstream: "true"
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: nx.mycompany.com
+      paths: ["/"]
