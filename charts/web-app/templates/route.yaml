@@ -1,20 +1,24 @@
 {{- if and .Values.openshift .Values.route.enabled -}}
-{{- range $index,$host := ( splitList "@" (include "webapp.hosts" . )) }}
+{{- range $index,$host := ( splitList "@" (include "web-app.hosts" . )) }}
 ---
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   {{- if eq $index 0 }}
-  name: {{ include "webapp.fullname" $ }}
+  name: {{ include "web-app.fullname" $ }}
   {{- else }}
-  name: {{ include "webapp.fullname" $ }}-extra{{ $index }}
+  name: {{ include "web-app.fullname" $ }}-extra{{ $index }}
+  {{- end }}
+  annotations:
+  {{- if or $.Values.autoscaling.enabled (gt (int $.Values.replicaCount) 1) }}
+    haproxy.router.openshift.io/balance: roundrobin
+    haproxy.router.openshift.io/disable_cookies: 'true'
   {{- end }}
   {{- with $.Values.route.annotations }}
-  annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
-    {{- include "webapp.labels" $ | nindent 4 }}
+    {{- include "web-app.labels" $ | nindent 4 }}
 spec:
   host: {{ $host }}
   {{- if and (eq $index 0) $.Values.route.secure }}
@@ -25,11 +29,12 @@ spec:
   tls:
     termination: {{ $.Values.route.termination }}
   {{- end }}
+  path: {{ $.Values.route.path }}
   port:
     targetPort: tcp-{{ $.Values.port }}
   to:
     kind: Service
-    name: {{ include "webapp.fullname" $ }}
+    name: {{ include "web-app.fullname" $ }}
     weight: 100
   wildcardPolicy: None
 {{- end }}

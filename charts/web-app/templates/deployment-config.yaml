@@ -3,9 +3,9 @@
 apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
 metadata:
-  name: {{ include "webapp.fullname" . }}
+  name: {{ include "web-app.fullname" . }}
   labels:
-    {{- include "webapp.labels" . | nindent 4 }}
+    {{- include "web-app.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   revisionHistoryLimit: {{ .Values.deployment.revisionHistoryLimit }}
@@ -14,15 +14,14 @@ spec:
   - imageChangeParams:
       automatic: {{ .Values.deployment.triggers.imageStreamChange }}
       containerNames:
-      - {{ include "webapp.fullname" . }}
+      - {{ include "web-app.fullname" . }}
       from:
         kind: ImageStreamTag
-        name: {{ printf "%s:%s" (include "webapp.fullname" .) .Values.image.tag }}
+        name: {{ printf "%s:%s" (include "web-app.fullname" .) .Values.image.tag }}
     type: ImageChange
   selector:
-    {{- include "webapp.labels" . | nindent 4 }}
-    deploymentconfig: {{ include "webapp.fullname" . }}
-  revisionHistoryLimit: 10
+    {{- include "web-app.labels" . | nindent 4 }}
+    deploymentconfig: {{ include "web-app.fullname" . }}
   strategy:
     activeDeadlineSeconds: 21600
     resources:
@@ -37,8 +36,8 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "webapp.labels" . | nindent 8 }}
-        deploymentconfig: {{ include "webapp.fullname" . }}
+        {{- include "web-app.labels" . | nindent 8 }}
+        deploymentconfig: {{ include "web-app.fullname" . }}
       annotations:
       {{- if .Values.envVars }}
         checksum/configenvvars: {{ include (print $.Template.BasePath "/secret-env-vars.yaml") . | sha256sum }}
@@ -50,124 +49,7 @@ spec:
         checksum/configfile: {{ include (print $.Template.BasePath "/configmap-file.yaml") . | sha256sum }}
       {{- end }}
     spec:
-    {{- if .Values.serviceAccount.create }}
-      serviceAccount: {{ include "webapp.serviceAccountName" . }}
-      serviceAccountName: {{ include "webapp.serviceAccountName" . }}
-    {{- end }}
-    {{- if .Values.image.pullSecret }}
-      imagePullSecrets:
-        - name: {{ .Values.image.pullSecret }}
-    {{- end }}
-{{- if .Values.initContainers }}
-      initContainers:
-{{ tpl (toYaml .Values.initContainers) . | indent 8 }}
-{{- end }}
-      containers:
-      - name: {{ include "webapp.fullname" . }}
-        imagePullPolicy: Always
-        {{- if .Values.command }}
-        command:
-          {{- toYaml .Values.command | nindent 10 }}
-        {{- end }}
-        {{- if .Values.args }}
-        args:
-          {{- toYaml .Values.args | nindent 10 }}
-        {{- end }}
-        ports:
-        - name: http
-          containerPort: {{ .Values.port }}
-          protocol: TCP
-        resources:
-          {{- toYaml .Values.resources | nindent 10 }}
-        {{- with .Values.livenessProbe }}
-        livenessProbe:
-          {{- toYaml . | nindent 10 }}
-        {{- end }}
-        {{- with .Values.readinessProbe }}
-        readinessProbe:
-          {{- toYaml . | nindent 10 }}
-        {{- end }}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-      {{- if .Values.deployment.mountEnvVars }}
-        {{- if or .Values.envVars .Values.envVarsSealed }}
-        envFrom:
-        {{- end }}
-        {{- with .Values.envVars }}
-          - secretRef:
-              name: {{ include "webapp.fullname" $ }}-env-vars
-        {{- end }}
-        {{- with .Values.envVarsSealed }}
-          - secretRef:
-              name: {{ include "webapp.fullname" $ }}-env-vars-sealed
-        {{- end }}
-      {{- end }}
-        {{- if .Values.runAsUser }}
-        securityContext:
-          runAsUser: {{ .Values.runAsUser }}
-        {{- end }}
-        volumeMounts:
-{{- if .Values.volumeMounts }}
-{{ tpl (toYaml .Values.volumeMounts | indent 10) . }}
-{{- end }}
-        {{- if .Values.configFile.mount }}
-          - mountPath: {{ .Values.configFile.mount }}
-            name: config-file
-            readOnly: true
-        {{- end }}
-        {{- if .Values.persistence.enabled }}
-          - name: pvc-1
-            mountPath: {{ .Values.persistence.mount }}
-        {{- end }}
-        {{- if .Values.extraPersistence.enabled }}
-          - name: pvc-2
-            mountPath: {{ .Values.extraPersistence.mount }}
-            readOnly: {{ .Values.extraPersistence.readOnly }}
-        {{- end }}
-      dnsPolicy: ClusterFirst
-      restartPolicy: Always
-      terminationGracePeriodSeconds: 30
-      {{- with .Values.podSecurityContext }}
-      securityContext:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      volumes:
-{{- if .Values.volumes }}
-{{ tpl (toYaml .Values.volumes | indent 8) . }}
-{{- end }}
-      {{- if .Values.configFile.mount }}
-        - name: config-file
-          configMap:
-            defaultMode: 420
-            name: {{ include "webapp.fullname" . }}-file
-            # items:
-            #   - key: {{ .Values.configFile.name }}
-            #     path: {{ .Values.configFile.name }}
-      {{- end }}
-      {{- if .Values.persistence.enabled }}
-        - name: pvc-1
-          persistentVolumeClaim:
-            claimName: {{ .Values.persistence.existingClaim | default (include "webapp.fullname" .) }}
-      {{- end }}
-      {{- if .Values.extraPersistence.enabled }}
-        - name: pvc-2
-          persistentVolumeClaim:
-            claimName: {{ include "webapp.fullname" . }}-extra
-      {{- end }}
-      securityContext:
-        {{- toYaml .Values.securityContext | nindent 8 }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- include "web-app.pod" . | nindent 6 -}}
   test: false
 {{- end }}
 {{- end }}

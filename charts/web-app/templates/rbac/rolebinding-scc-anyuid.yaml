@@ -1,0 +1,21 @@
+{{ if .Values.serviceAccount.anyuid }}
+{{ if .Values.serviceAccount.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ printf "anyuid-scc-%s" ( include "web-app.fullname" . ) }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "web-app.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:openshift:scc:anyuid
+subjects:
+- kind: ServiceAccount
+  name: {{ include "web-app.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+{{ else }}
+{{- printf "\n serviceAccount.anyuid=true requires non-default serviceAccount. Fix it by setting serviceAccount.create=true" | fail -}}
+{{ end }}
+{{ end }}

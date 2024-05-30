@@ -1,0 +1,19 @@
+{{- if .Values.apm.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: apm-{{ include "web-app.fullname" . }}
+  labels:
+    {{- include "web-app.labels" . | nindent 4 }}
+data:
+  ELASTIC_APM_SERVER_URL: {{ .Values.apmProvider.endpoint }}
+  ELASTIC_APM_ENVIRONMENT: {{ include "web-app.env" . }}
+  ELASTIC_APM_SERVICE_VERSION: {{ .Values.image.tag }}
+  ELASTIC_APM_SERVICE_NAME: {{ ternary ( include "web-app.appUniq" . ) (printf "%s-%s" ( include "web-app.project" . ) .Values.apm.appName) (eq .Values.apm.appName "") }}
+  ELASTIC_APM_LOG_LEVEL: {{ .Values.apm.logLevel }}
+  {{- if eq .Values.apm.runtime "java" }}
+  ELASTIC_APM_APPLICATION_PACKAGES: {{ .Values.apm.packages }}
+  JAVA_OPTS: "{{ include "web-app.apmJavaOpts" . }}"
+  {{- end }}
+
+{{- end }}

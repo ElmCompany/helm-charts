@@ -16,17 +16,17 @@ If so, this chart should answer your needs.
 
 # Values
 
-Check default Values of this chart [here](https://github.com/ElmCompany/helm-charts/blob/master/charts/webapp/values.yaml)
+Check default Values of this chart [here](https://github.com/ElmCompany/helm-charts/blob/master/charts/web-app/values.yaml)) 
 
 # How to install the app 
 
-**Set Elm Repo**
 ```sh
 helm repo add elm https://raw.githubusercontent.com/ElmCompany/helm-charts/gh-pages
-helm repo update
+-helm repo update
 ```
 
-**Use it** `helm install elm/webapp`
+Also this helm chart requires a Helm release name in this format: 
+`{project}-{app}-{environment}` where environment is "ci", "dev", "qa","staging" or "prod"
 
 # Authors
 

@@ -1,0 +1,19 @@
+{{- if eq (include "web-app.is-job" . ) "true" }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "web-app.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+{{- with .Values.job.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+{{- end }}
+  labels:
+    {{- include "web-app.labels" . | nindent 4 }}
+spec:
+  backoffLimit: {{ .Values.job.backoffLimit }}
+  template:
+    spec:
+      {{- include "web-app.pod" . | nindent 6 -}}
+
+{{ end }}

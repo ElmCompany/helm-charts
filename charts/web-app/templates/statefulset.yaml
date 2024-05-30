@@ -1,26 +1,20 @@
-{{ if .Values.deployment.enabled }}
-{{- if eq .Values.deployment.kind "Deployment" }}
-apiVersion: apps/v1
-kind: Deployment
+{{- if .Values.deployment.enabled }}
+{{- if eq (include "web-app.is-statefulset" . ) "true" }}
+apiVersion: "apps/v1"
+kind: StatefulSet
 metadata:
   name: {{ include "web-app.fullname" . }}
   labels:
     {{- include "web-app.labels" . | nindent 4 }}
-  {{- if or .Values.deployment.annotations .Values.autoscaling.enabled }}
-  annotations:
-  {{- end }}
-  {{- if .Values.autoscaling.enabled }}
-    app.kubernetes.io/horizontal-autoscaled: "true"
-  {{- end }}
-
-
 spec:
-  revisionHistoryLimit: {{ .Values.deployment.revisionHistoryLimit }}
+  serviceName: {{ include "web-app.fullname" . }}-headless
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
+  updateStrategy:
+    type: {{ .Values.rollout.type }}
   selector:
-    matchLabels:
+     matchLabels:
       {{- include "web-app.selectorLabels" . | nindent 6 }}
   template:
     metadata:
@@ -41,5 +35,16 @@ spec:
         {{- include "web-app.selectorLabels" . | nindent 8 }}
     spec:
       {{- include "web-app.pod" . | nindent 6 -}}
+
+  {{- if or .Values.volumeClaimTemplates (eq (include "web-app.hasVolumeclaimtemplatesFromPersistence" .) "true") }}
+  volumeClaimTemplates:
+    {{- with .Values.volumeClaimTemplates }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- if eq (include "web-app.hasVolumeclaimtemplatesFromPersistence" .) "true" }}
+    {{- include "web-app.volumeclaimtemplatesFromPersistence" . | nindent 4 -}}
+    {{- end }}
+  {{- end }} {{/*IF ends */}}
+
 {{- end }}
 {{- end }}

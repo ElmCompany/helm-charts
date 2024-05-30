@@ -4,44 +4,24 @@
 {{- end }}
 1. Get the application URL by running these commands:
 {{- if .Values.route.enabled }}
-  app is accessible at https://{{ include "webapp.host" . }}
+  app is accessible at https://{{ include "web-app.host" . }}
 {{- end }}
 {{- if contains "NodePort" .Values.service.type -}}
-  export NODE_PORT=$({{ $kubeclient }} get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "webapp.fullname" . }})
+  export NODE_PORT=$({{ $kubeclient }} get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "web-app.fullname" . }})
   export NODE_IP=$({{ $kubeclient }} get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
   echo http://$NODE_IP:$NODE_PORT
 {{- else if contains "LoadBalancer" .Values.service.type }}
      NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-           You can watch the status of by running '{{ $kubeclient }} get --namespace {{ .Release.Namespace }} svc -w {{ include "webapp.fullname" . }}'
-  export SERVICE_IP=$({{ $kubeclient }} get svc --namespace {{ .Release.Namespace }} {{ include "webapp.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+           You can watch the status of by running '{{ $kubeclient }} get --namespace {{ .Release.Namespace }} svc -w {{ include "web-app.fullname" . }}'
+  export SERVICE_IP=$({{ $kubeclient }} get svc --namespace {{ .Release.Namespace }} {{ include "web-app.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
   echo http://$SERVICE_IP:{{ .Values.service.port }}
 {{- else if contains "ClusterIP" .Values.service.type }}
-  export POD_NAME=$({{ $kubeclient }} get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "webapp.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  export POD_NAME=$({{ $kubeclient }} get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "web-app.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
   echo "Visit http://127.0.0.1:8080 to use your application"
   {{ $kubeclient }} --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:80
 {{- end }}
 
 {{- if .Values.envVarsSealed }}
 You are providing values for "envVarsSealed": 
-Make sure that you encrypted it in the right way:
-{{- if eq .Values.sealScope "cluster-wide" }}
-echo -n YOUR_CLEAR_VALUE | \
-  kubeseal --cert https://seal.dev-apps.elm.sa/v1/cert.pem \
-  --raw --from-file=/dev/stdin \
-  --scope cluster-wide
-{{- else if eq .Values.sealScope "namespace-wide" }}
-echo -n YOUR_CLEAR_VALUE | \
-  kubeseal --cert https://seal.dev-apps.elm.sa/v1/cert.pem \
-  --raw --from-file=/dev/stdin \
-  --scope namespace-wide \
-  --namespace {{ .Release.Namespace }}
-{{- else if eq .Values.sealScope "strict" }}
-echo -n YOUR_CLEAR_VALUE | \
-  kubeseal --cert https://seal.dev-apps.elm.sa/v1/cert.pem \
-  --raw --from-file=/dev/stdin \
-  --scope namespace-wide \
-  --namespace {{ .Release.Namespace }} \
-  --name {{ include "webapp.fullname" . }}-env-vars-sealed
-{{- end }}
-
+Make sure that you encrypted it in the right way
 {{- end }}

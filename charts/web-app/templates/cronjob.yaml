@@ -1,10 +1,10 @@
 {{ if .Values.cronjob.enabled }}
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ include "webapp.fullname" . }}
+  name: {{ include "web-app.fullname" . }}
   labels:
-    {{- include "webapp.labels" . | nindent 4 }}
+    {{- include "web-app.labels" . | nindent 4 }}
 spec:
   concurrencyPolicy: {{ .Values.cronjob.concurrencyPolicy }}
   {{- if .Values.cronjob.failedJobsHistoryLimit }}
@@ -15,15 +15,15 @@ spec:
       template:
         spec:
         {{- if .Values.serviceAccount.create }}
-          serviceAccount: {{ include "webapp.serviceAccountName" . }}
-          serviceAccountName: {{ include "webapp.serviceAccountName" . }}
+          serviceAccount: {{ include "web-app.serviceAccountName" . }}
+          serviceAccountName: {{ include "web-app.serviceAccountName" . }}
         {{- end }}
           containers:
-          - image: '{{ .Values.cronjob.image.repository }}:{{ include "webapp.cronjobImageTag" . }}'
+          - image: '{{ .Values.cronjob.image.repository }}:{{ .Values.cronjob.image.tag }}'
             imagePullPolicy: {{ .Values.cronjob.image.pullPolicy }}
             {{- with .Values.cronjob.command }}
             command:
-              {{- toYaml . | nindent 14 }}
+              {{- tpl (toYaml .) $ | nindent 14 }}
             {{- end }}
             {{- if .Values.cronjob.args }}
             args:
@@ -40,11 +40,11 @@ spec:
             {{- end }}
             {{- with .Values.envVars }}
               - secretRef:
-                  name: {{ include "webapp.fullname" $ }}-env-vars
+                  name: {{ include "web-app.fullname" $ }}-env-vars
             {{- end }}
             {{- with .Values.envVarsSealed }}
               - secretRef:
-                  name: {{ include "webapp.fullname" $ }}-env-vars-sealed
+                  name: {{ include "web-app.fullname" $ }}-env-vars-sealed
             {{- end }}
           {{- end }}
           {{- if or .Values.cronjob.persistentMountPath .Values.cronjob.extraPersistentMountPath }}
@@ -80,12 +80,12 @@ spec:
         {{- if .Values.cronjob.persistentMountPath }}
           - name: pvc-1
             persistentVolumeClaim:
-              claimName: {{ .Values.persistence.existingClaim | default (include "webapp.fullname" .) }}
+              claimName: {{ .Values.persistence.existingClaim | default (include "web-app.fullname" .) }}
         {{- end }}
         {{- if .Values.cronjob.extraPersistentMountPath }}
           - name: pvc-2
             persistentVolumeClaim:
-              claimName: {{ include "webapp.fullname" . }}-extra
+              claimName: {{ include "web-app.fullname" . }}-extra
         {{- end }}
   schedule: "{{ .Values.cronjob.schedule | toString }}"
   successfulJobsHistoryLimit: 3

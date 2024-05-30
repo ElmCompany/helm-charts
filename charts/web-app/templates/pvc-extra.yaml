@@ -1,10 +1,13 @@
+{{- if eq (include "web-app.is-statefulset" . ) "false" }}
 {{ if .Values.extraPersistence.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "webapp.fullname" . }}-extra
+  name: {{ include "web-app.fullname" . }}-extra
   labels:
-    {{- include "webapp.labels" . | nindent 4 }}
+    storage.{{ .Values.companyDomain }}/class: '{{ default "default" (ternary "default" .Values.extraPersistence.storageClass (eq .Values.extraPersistence.storageClass "-")) }}'
+    {{- include "web-app.labels" . | nindent 4 }}
+
   # finalizers:
   # - kubernetes.io/pvc-protection
 spec:
@@ -23,4 +26,5 @@ spec:
   storageClassName: "{{ .Values.extraPersistence.storageClass }}"
 {{- end }}
 {{- end }}
-{{ end }}
+{{- end }}
+{{- end }}

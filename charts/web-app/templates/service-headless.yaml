@@ -1,8 +1,8 @@
-{{- if eq (include "web-app.is-job" . ) "false" }}
+{{- if eq (include "web-app.is-statefulset" . ) "true" }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "web-app.fullname" . }}
+  name: {{ include "web-app.fullname" . }}-headless
   labels:
     {{- include "web-app.labels" . | nindent 4 }}
 spec:
@@ -21,4 +21,5 @@ spec:
     {{- end }}
   sessionAffinity: None
   type: ClusterIP
+  clusterIP: None
 {{- end }}

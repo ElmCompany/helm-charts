@@ -1,11 +1,13 @@
 apiVersion: v2
-name: webapp
+name: web-app
 description: | 
-  A Helm chart to install any web application that requires 
-  a single deployment(pod), with a single container.
+  This is a very generic helm chart that allows you deploy any Web Application
+  with couple of features like Observability (APM, PBD, ..etc) like persistence
+  It allow you also to switch between Pod controllers easilty: Deployment, Statefulset,...etc
 
+icon: https://raw.githubusercontent.com/ElmCompany/helm-charts/master/assets/icons/generic-app.png
 keywords:
-  - webapp
+  - web-app
   - pod
   - route
   - web
@@ -15,7 +17,8 @@ keywords:
   - openshift
   - ocp3
   - openshift3
-  - elm
+  - apm
+  - openshift4
 # A chart can be either an 'application' or a 'library' chart.
 #
 # Application charts are a collection of templates that can be packaged into versioned archives
@@ -29,12 +32,12 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 1.2.1
+version: 3.2.15
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
-appVersion: latest
+appVersion: 1.16.0
 dependencies: []
 
 sources:

@@ -1,10 +1,10 @@
 {{- if .Values.autoscaling.enabled }}
-apiVersion: autoscaling/v2beta1
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "webapp.fullname" . }}
+  name: {{ include "web-app.fullname" . }}
   labels:
-    {{- include "webapp.labels" . | nindent 4 }}
+    {{- include "web-app.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     {{- if eq .Values.deployment.kind "DeploymentConfig" }}
@@ -13,20 +13,23 @@ spec:
     apiVersion: apps/v1
     {{- end }}
     kind: {{ .Values.deployment.kind }}
-    name: {{ include "webapp.fullname" . }}
+    name: {{ include "web-app.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:
-  {{- if .Values.autoscaling.targetCPUUtilizationPercentage }}
-    - type: Resource
-      resource:
-        name: cpu
-        targetAverageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
-  {{- end }}
-  {{- if .Values.autoscaling.targetMemoryUtilizationPercentage }}
-    - type: Resource
-      resource:
-        name: memory
-        targetAverageUtilization: {{ .Values.autoscaling.targetMemoryUtilizationPercentage }}
-  {{- end }}
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: {{ .Values.autoscaling.targetMemoryUtilizationPercentage }}
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        # TODO : auto-default it based on env ( prod=50 , dev=85)
+        averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
+        # type: AverageValue
+        # averageValue: 500m
 {{- end }}

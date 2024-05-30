@@ -1,10 +1,12 @@
+{{- if eq (include "web-app.is-statefulset" . ) "false" }}
 {{- if and .Values.persistence.enabled (not .Values.persistence.existingClaim) -}}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "webapp.fullname" . }}
+  name: {{ include "web-app.fullname" . }}
   labels:
-    {{- include "webapp.labels" . | nindent 4 }}
+    storage.{{ .Values.companyDomain }}/class: '{{ default "default" (ternary "default" .Values.persistence.storageClass (eq .Values.persistence.storageClass "-")) }}'
+    {{- include "web-app.labels" . | nindent 4 }}
   # finalizers:
   # - kubernetes.io/pvc-protection
 spec:
@@ -21,6 +23,7 @@ spec:
   storageClassName: ""
 {{- else }}
   storageClassName: "{{ .Values.persistence.storageClass }}"
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

@@ -1,63 +1,97 @@
-# Default values for webapp.
+# @param companyDomain - used for labeling resources if required
+companyDomain: company.com
+# Default values for web-app.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-openshift: false
+openshift: true
+## @param replicaCount
 replicaCount: 1
+## @param replicaMinAvailable it's PodDisruptionBudget.spec.minAvailable
+##     An eviction is allowed if at least "minAvailable" pods selected by
+##     "selector" will still be available after the eviction, i.e. even in the
+##     absence of the evicted pod. So for example you can prevent all voluntary
+##     evictions by specifying "100%".
+replicaMinAvailable: 1
+## @section App Image
+
+## @param image.registry App image registry (i.e. registry.company.lan )
+## @param image.tag App image tag (i.e v1.2.2)
+## @param image.pullSecret secret allows the App to be pulled from the registry
+## @param image.stream Openshift image stream configuration Instead Of image.repository. Includes 2 fields: name and namespace
 image:
+  ## @param image.registry 
+  registry: ""
   ## tag: latest (check image tag pushed by pipeline service after build)
-  tag:
+  tag: ""
+  ## @param image.repository
+  ##
   ## One of two is REQUIRED: either image.repository or image.stream...and NOT both
-  ## repository: .e.g. my.registry/myproject/myapp
-  repository:
+  ## repository: .e.g. registry.company.lan/myproj/myapp
+  ##            it's the full image name , except the tag
+  ##             Useful if the image is outside the internal
+  ##             registry of the OCP cluster (e.g. dev, qa)
+  ##        (check image repo pushed by pipeline service after build)
+  repository: ""
   ## pullSecret: if repository is private, use pullSecret
+  ##             defaults to nexus
   pullSecret: ""
   ## imagestream - relative to the Cluster where resources will be deployed
   ##               useful if the image is inside the internal
   ##               registry of the OCP cluster (.e.g staging, prod)
-  ##   for example, if the image is availabe in OCP internal registry under
-  ##    this name: "registry.ocp.company.co/ocp-project/myapp:v1.0.0"
-  ##    then:
+
   # stream:
   #   name: myapp
-  #   namespace: myocp-project
+  #   namespace:
+  # @param image.stream Openshift Image Stream Settings
+  ## It requires image.registry (i.e. docker-registry.default.svc:5000)
   stream:
-    ## imagestream resource name
+    ## @param image.stream.name imagestream resource name
     name:
-    ## namespace like: myocp-project : depends where is your imagestream
-    ## it defaults to namespace of the RELEASE
+    ## @param image.stream.namespace
+    ## namespace like: myproject or openshift : depends where is your imagestream
+    ## it defaults to namespace of the RELEASE (.Release.Namespace)
     namespace:
-    registry: docker-registry.default.svc:5000
 
-# alternative of entrypoint in docker-compose
+## @param command alternative of entrypoint in docker-compose
+##
 command: []
-# alternative of command in docker-compose
+## @param args alternative of command in docker-compose
 args: []
-### more props about deployment ###
+
+
+## @param deployment more props about deployment
+## @param deployment.enabled Enable Pod run as Deployment not as cronjob or something else
+## @param deployment.kind Kind of Resource running the App : Deployment or DeploymentConfig
 deployment:
   enabled: true
-  ## the kind of deployment : Deployment or DeploymentConfig
+  ## the kind of deployment : Deployment or DeploymentConfig or Job
   kind: Deployment
   mountEnvVars: true
+  annotations: {}
   ## about how many replicaset should be kept in the history
   revisionHistoryLimit: 5
   ## triggers for auto rolling-update pods.
   triggers:
     imageStreamChange: true
-## your app port (container port)
+## @param port your app port (container port)
 # port: 5000 # maybe for python app
 # port: 3000 # maybe for nodejs, react app,.. so on
 port: 8080
+## @param extraPorts extra ports
+# extraPorts: [1378, 5040]
 extraPorts: []
-## Assiging public Hostname to your app
+
+## @param route Assiging public Hostname to your app
 route:
   enabled: false
-  ## domain: dev-apps.elm.sa
+  ## domain: i.e. cluster.apps.company.lan
   ## if you specify domain, the chart will automatically calculate
   ## the subdomain , then the full hostname will be subdomain.domain
-  domain:
+  domain: ''
   ## specify the exact hostname as you want
   ## without delegating it to the automation
-  host:
+  host: ''
+  path: /
   extraHosts: []
   ## .Values.route.secure
   ## To enable tls for host, set secure: true
@@ -69,13 +103,11 @@ route:
   termination: edge
   ## .Values.route.annotations
   # annotations:
-  #   kubernetes.io/ingress.class: nginx
   #   nginx.ingress.kubernetes.io/rewrite-target: /scm/$1
   annotations: {}
   ## .Values.route.path
   # path: /(.*) # useful when rewrite-target used
-  # path: /
-  path:
+  path: /
 
 ####
 ## Environment Variables to be populated inside the container of the app
@@ -86,15 +118,15 @@ route:
 envVars: {}
 ####
 ## Environment Variables where
-##   its values has been SEALED with kubeseal:
-##     https://wiki.elm.sa/display/TAKS/kubeseal
+##   its values has been SEALED with kubeseal - cluster-wide scope by default:
+##     Check : https://github.com/bitnami-labs/sealed-secrets
 # envVarsSealed:
 #   DB_PASS: AgAhm1kcbWFHW......
 envVarsSealed: {}
 ### sealScope:
 ## One of 3 values: cluster-wide, namespace-wide or strict
 ### if cluster-wide, you have to kubeseal with --scope cluster-wide.. so on
-##  More details:   https://wiki.elm.sa/display/TAKS/kubeseal
+##  More details:   https://github.com/bitnami-labs/sealed-secrets
 sealScope: cluster-wide
 # https://github.com/bitnami-labs/sealed-secrets#scopes
 sealScopes:
@@ -102,6 +134,30 @@ sealScopes:
   - namespace-wide
   - strict
 ####
+## Environment Variables Already exist in some configMap or/and secrets
+# envFrom:
+#   - configMapRef:
+#       name: my-existing-configmap
+#   - secretRef:
+#       name: my-existing-secret
+####
+envFrom: []
+
+#####
+## Environment Variables Already in some ocnfigMap or/and Secrets
+## But you wanna mount it with different keys.
+# - name: SPRING_BUCKET_NAME
+#   valueFrom:
+#     configMapKeyRef:
+#       name: <obc-name>
+#       key: BUCKET_NAME
+# - name: SPRING_S3_ACCESS_KEY
+#   valueFrom:
+#     secretKeyRef:
+#       name: <obc-name>
+#       key: AWS_ACCESS_KEY_ID
+######
+env: []
 ### configFile is useful to mount a whole config file ###
 configFile:
   name: # application.properties
@@ -117,12 +173,16 @@ configFile:
   mount: # /opt/app
 serviceAccount:
   ## Specifies whether a service account should be created
-  create: false
+  create: true
   ## Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
+  # @param serviceAccount.anyuid - grant the SCC anyuid for the serviceaccount
+  anyuid: false
+  # @param serviceAccount.privileged - use case when securityContext requires capability SYS_CHROOT and runAsUser 0, and runAsGroup 0
+  privileged: false
 
 podAnnotations: {}
 
@@ -132,19 +192,15 @@ podSecurityContext: {}
 # runAsUser: 1001
 runAsUser:
 
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
-
 service:
   type: ClusterIP
   port: 80
 
-## livenessProbe ##
+## @param startupProbe
+### Use case for legacy app which has long startup
+startupProbe: {}
+
+## @param livenessProbe ##
 ## How to know that your app is alive. If it's not alive, it will keep restarting
 ##   more details: oc explain dc.spec.template.spec.containers.livenessProbe
 ## If you do want to specify resources, uncomment the following
@@ -171,7 +227,7 @@ livenessProbe: {}
   # tcpSocket:
   #   port: 6379
 
-## readinessProbe ##
+## @param readinessProbe ##
 ## How to know that your app is READY to receive traffic?
 ## If it's not ready, endpoint between service/pod will not be created
 ##    then traffic will not be forwarded to the pod
@@ -196,12 +252,22 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
-## securityContext Pod Level:
+## @param securityContext Pod Level
+##
 ## Get fields of this value by running "oc explain dc.spec.template.spec.securityContext"
 ## If you do want to specify resources, uncomment the following
 ## lines, adjust them as necessary, and remove the curly braces after 'securityContext:'.
+## securityContext:
+##   capabilities:
+##     drop:
+##     - ALL
+##   readOnlyRootFilesystem: true
+##   runAsNonRoot: true
+##   runAsUser: 1000
 securityContext: {}
 rollout:
+  # In kind=Statefulset, 2 values available: RollingUpdate or OnDelete
+  type: RollingUpdate
   resources: {}
     # limits:
     #   cpu: 100m
@@ -214,8 +280,8 @@ autoscaling:
   enabled: false
   minReplicas: 1
   maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 70
 
 nameOverride: ""
 fullnameOverride: ""
@@ -226,6 +292,7 @@ tolerations: []
 
 affinity: {}
 
+
 ### Do you requires any data persistence ? ###
 persistence:
   enabled: false
@@ -233,7 +300,7 @@ persistence:
   readOnly: false
   size: 1Gi
   existingClaim:
-  accessMode: ReadWriteMany # or ReadWriteOnce
+  accessMode: ReadWriteOnce # ReadWriteMany
   ## jenkins data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -250,7 +317,7 @@ extraPersistence:
   mount: # .e.g /var/lib/redis/data
   readOnly: false
   size: 1Gi
-  accessMode: ReadWriteMany # or ReadWriteOnce
+  accessMode: ReadWriteOnce # ReadWriteMany
   ## jenkins data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -261,9 +328,9 @@ extraPersistence:
 ########### Additional Resources ############
 ## initContainers
 ## it's List / Array
-initContainers:
+initContainers: []
   # - name: env-generator
-  #   image: docker.io/abdennour/dotenv-to-js-object:4ea
+  #   image: abdennour/dotenv-to-js-object:4ea
   #   args:
   #     - --dest=/data
   #     - --env-vars-filter=REACT_APP_
@@ -274,16 +341,32 @@ initContainers:
   #   envFrom:
   #     - secretRef:
 
+### Same Shape as initContainers
+containers: []
 ## additional volumeMounts
 ## it's List / Array
-volumeMounts:
+volumeMounts: []
   # - name: data-env
   #   mountPath: /usr/share/nginx/html/config
 ## additional volumes
 ## it's list / Array
-volumes:
+volumes: []
   # - name: data-env
   #   emptyDir: {}
+
+## additional volumeClaimTemplates
+# volumeClaimTemplates:
+#   - apiVersion: v1
+#     kind: PersistentVolumeClaim
+#     metadata:
+#       name: data
+#     spec:
+#       accessModes:
+#         - "ReadWriteOnce"
+#       resources:
+#         requests:
+#           storage: "10Gi"
+volumeClaimTemplates: []
 
 networkPolicy:
   3scale:
@@ -291,16 +374,56 @@ networkPolicy:
     namespace: 3scale
     labels:
       app: APIcast
+
+apm:
+  enabled: false
+  # java, dotnet, nodejs, python, go, rust, php
+  runtime: ""
+  # default to a smart calculation of app name
+  appName: ""
+  # One of:  OFF, ERROR, CRITICAL, WARN, WARNING, INFO, DEBUG, TRACE
+  logLevel: INFO # INFO # TRACE
+  # https://www.elastic.co/guide/en/apm/agent/java/current/config-logging.html
+  logFile: /dev/stdout # System.out
+  packages: com.company
+  # @param apm.imageTag last released image from cloudnative/sidecar-elastic-apm-agent
+  imageTag: v1.45-afd238e # 1.36.0-9b76405
+apmProvider:
+  name: elastic
+  endpoint: http://apm.services
+  token: user:pass_base64Deoced
+  supportedRuntimes:
+    - java
+    - dotnet
+    - php
+    - python
+    - go
+    - nodejs
+    - rust
+
+
+# \@param job Customize the app if it runs as job @param .deployment.kind == Job
+job:
+  restartPolicy: Never # OnFailure
+  # @param job.backoffLimit - Specifies the number of retries before marking this job failed.
+  backoffLimit: 0
+  # @param job.annotations specify the Job hook ( pre, post, ..etc). Default to Pre Hook
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation # HookSucceeded  
+
+
 cronjob:
   enabled: false
   image:
-    # .i.e: my.registry/myproject/myapp
+    # .i.e: registry.company.lan/myproject/myapp
     repository:
     # .i.e: 1.0.0-er3299
     tag:
     pullPolicy: IfNotPresent
-    # i.e: nexus-registry-secret
-    pullSecret: ""
+    # i.e: nexus
+    pullSecret:
   restartPolicy: Always # OnFailure
   ## command ------------
   # command:
