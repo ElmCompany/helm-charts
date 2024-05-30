@@ -578,6 +578,39 @@ entries:
     urls:
     - https://github.com/ElmCompany/helm-charts/releases/download/single-page-app-1.9.0/single-page-app-1.9.0.tgz
     version: 1.9.0
+  web-app:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-05-30T18:39:28.752024736Z"
+    description: 'This is a very generic helm chart that allows you deploy any Web
+      Application with couple of features like Observability (APM, PBD, ..etc) like
+      persistence It allow you also to switch between Pod controllers easilty: Deployment,
+      Statefulset,...etc '
+    digest: 6e6f956862270d88a54f750354d4b5a11a29d8c0826c820173ba137170333dbb
+    icon: https://raw.githubusercontent.com/ElmCompany/helm-charts/master/assets/icons/generic-app.png
+    keywords:
+    - web-app
+    - pod
+    - route
+    - web
+    - mount
+    - envvars
+    - dotenv
+    - openshift
+    - ocp3
+    - openshift3
+    - apm
+    - openshift4
+    maintainers:
+    - email: github@abdennoor.com
+      name: abdennour
+    name: web-app
+    sources:
+    - https://github.com/ElmCompany/helm-charts.git
+    type: application
+    urls:
+    - https://github.com/ElmCompany/helm-charts/releases/download/web-app-3.2.15/web-app-3.2.15.tgz
+    version: 3.2.15
   webapp:
   - apiVersion: v2
     appVersion: latest
@@ -635,4 +668,4 @@ entries:
     urls:
     - https://github.com/ElmCompany/helm-charts/releases/download/webapp-1.2.0/webapp-1.2.0.tgz
     version: 1.2.0
-generated: "2023-07-14T17:18:59.694746195Z"
+generated: "2024-05-30T18:39:28.752081102Z"
